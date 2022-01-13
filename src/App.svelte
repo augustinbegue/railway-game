@@ -1,8 +1,9 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import Two from "two.js";
-
+    import StationContextMenu from "./components/StationContextMenu.svelte";
+    import { GameRenderer } from "./modules/renderer";
     import type { Map, Line, Station, Link, Position } from "./types";
+    import Two from "two.js";
 
     let map: Map = {
         width: 10000,
@@ -18,7 +19,8 @@
                 y: 450,
             },
             linesIndex: [0],
-            linkedTo: [1, 4],
+            linkedTo: [1, 4, 7],
+            size: 10,
         },
         {
             id: "1",
@@ -29,6 +31,7 @@
             },
             linesIndex: [0],
             linkedTo: [0, 3, 5, 6],
+            size: 10,
         },
         {
             id: "2",
@@ -39,6 +42,7 @@
             },
             linesIndex: [0],
             linkedTo: [3],
+            size: 10,
         },
         {
             id: "3",
@@ -49,6 +53,7 @@
             },
             linesIndex: [0],
             linkedTo: [1, 2],
+            size: 10,
         },
         {
             id: "4",
@@ -58,7 +63,8 @@
                 y: 410,
             },
             linesIndex: [0],
-            linkedTo: [0],
+            linkedTo: [0, 8],
+            size: 10,
         },
         {
             id: "5",
@@ -69,6 +75,7 @@
             },
             linesIndex: [1],
             linkedTo: [1],
+            size: 10,
         },
         {
             id: "6",
@@ -79,6 +86,29 @@
             },
             linesIndex: [1],
             linkedTo: [1],
+            size: 10,
+        },
+        {
+            id: "7",
+            name: "Maisons-Alfort",
+            position: {
+                x: 1000,
+                y: 650,
+            },
+            linesIndex: [1],
+            linkedTo: [0],
+            size: 10,
+        },
+        {
+            id: "8",
+            name: "Vincennes",
+            position: {
+                x: 1100,
+                y: 400,
+            },
+            linesIndex: [1],
+            linkedTo: [4],
+            size: 10,
         },
     ];
 
@@ -96,111 +126,28 @@
     ];
 
     // Drawing constants
-    let two: Two;
-    let STATION_RADIUS = 10;
+    let renderer: GameRenderer;
 
-    function render() {
-        two = new Two({
-            fullscreen: true,
-            autostart: true,
-        }).appendTo(document.body);
-
-        // Build the links graph adjacency matrix
-        let links: Link[][] = [];
-
-        for (let i = 0; i < stations.length; i++) {
-            const station = stations[i];
-            links[i] = [];
-
-            for (let j = 0; j < station.linkedTo.length; j++) {
-                let link: Link = {
-                    from: i,
-                    to: station.linkedTo[j],
-                    tracks: 2,
-                    line: undefined,
-                };
-
-                links[i].push(link);
-            }
-        }
-
-        console.log(links);
-
-        // Draw each link between stations
-        for (let i = 0; i < stations.length; i++) {
-            const station = stations[i];
-
-            for (let j = 0; j < station.linkedTo.length; j++) {
-                drawLink(two, links, i);
-            }
-        }
-
-        for (let k = 0; k < stations.length; k++) {
-            const station = stations[k];
-
-            let circle = two.makeCircle(
-                station.position.x,
-                station.position.y,
-                STATION_RADIUS,
-            );
-            circle.fill = "#8f9ebf";
-            circle.clip = false;
-            circle.noStroke();
-
-            let text = two.makeText(
-                station.name,
-                station.position.x,
-                station.position.y - STATION_RADIUS * 2,
-                {},
-            );
-
-            text.size = 20;
-            text.linewidth = 0.3;
-            text.noStroke();
-            text.fill = "#d6d9df";
-            text.family = "Product Sans";
-        }
-    }
-
-    function drawLink(two: Two, links: Link[][], from: number) {
-        let linkAdjList = links[from];
-
-        for (let i = 0; i < linkAdjList.length; i++) {
-            const link = linkAdjList[i];
-
-            if (link.line) {
-                continue;
-            }
-
-            let fromStation = stations[from];
-            let toStation = stations[link.to];
-
-            let fromPosition = fromStation.position;
-            let toPosition = toStation.position;
-
-            link.line = two.makeLine(
-                fromPosition.x,
-                fromPosition.y,
-                toPosition.x,
-                toPosition.y,
-            );
-            link.line.linewidth = 6;
-            link.line.stroke = "#626c80";
-
-            let oppositelink = links[link.to].find((l) => l.to === from);
-            console.log(oppositelink, link.to, from);
-            oppositelink.line = link.line;
-        }
-    }
+    // onClick station
+    let hoveredStation: Station | null = null;
+    let selectedStation: Station | null = null;
+    let stationContextMenuOpen: boolean = false;
 
     onMount(() => {
-        render();
+        renderer = new GameRenderer(stations);
 
         document.body.onwheel = (e) => {
-            two.scene.scale -= e.deltaY / 1000;
-            if (two.scene.scale < 0.1) {
-                two.scene.scale = 0.1;
+            renderer.two.scene.scale -= e.deltaY / 500;
+            if (renderer.two.scene.scale < 0.1) {
+                renderer.two.scene.scale = 0.1;
             }
+            renderer.two.scene.translation.x += e.deltaY;
+            renderer.two.scene.translation.y += e.deltaY;
+        };
+
+        // Mouse Events
+        let stationOnClick = (e: MouseEvent) => {
+            stationContextMenuOpen = true;
         };
 
         let dragging = false;
@@ -208,30 +155,75 @@
         document.body.onmousedown = (e) => {
             dragging = true;
             dragStart = { x: e.clientX, y: e.clientY };
+
+            if (hoveredStation) {
+                selectedStation = hoveredStation;
+                stationOnClick(e);
+            } else {
+            }
         };
 
+        let mouse = new Two.Vector(0, 0);
         document.body.onmousemove = (e) => {
-            if (!dragging) {
-                return;
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+
+            if (dragging) {
+                let dx = e.clientX - dragStart.x;
+                let dy = e.clientY - dragStart.y;
+
+                renderer.two.scene.translation.x += dx;
+                renderer.two.scene.translation.y += dy;
+
+                dragStart = { x: e.clientX, y: e.clientY };
+            } else {
+                let correctedMouse = new Two.Vector(
+                    (mouse.x - renderer.two.scene.translation.x) /
+                        renderer.two.scene.scale,
+                    (mouse.y - renderer.two.scene.translation.y) /
+                        renderer.two.scene.scale,
+                );
+
+                for (let i = 0; i < stations.length; i++) {
+                    const station = stations[i];
+
+                    let v = new Two.Vector(
+                        station.position.x - correctedMouse.x,
+                        station.position.y - correctedMouse.y,
+                    );
+
+                    const dist = Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.y, 2));
+
+                    if (dist < station.size) {
+                        hoveredStation = station;
+                        document.body.style.cursor = "pointer";
+                        return;
+                    } else {
+                        document.body.style.cursor = "default";
+                    }
+                }
+
+                hoveredStation = null;
             }
-
-            let dx = e.clientX - dragStart.x;
-            let dy = e.clientY - dragStart.y;
-
-            two.scene.translation.x += dx;
-            two.scene.translation.y += dy;
-
-            dragStart = { x: e.clientX, y: e.clientY };
         };
 
         document.body.onmouseup = (e) => {
             dragging = false;
         };
     });
-
-    // TODO: Data structure:
-    // Graph containing stations as vertices and links as edges
 </script>
+
+{#if renderer}
+    <div class="h-full w-full absolute z-10">
+        <div class="h-full w-full container mx-auto flex flex-col-reverse ">
+            <StationContextMenu
+                {renderer}
+                open={stationContextMenuOpen}
+                station={selectedStation}
+            />
+        </div>
+    </div>
+{/if}
 
 <style lang="postcss">
     @tailwind base;

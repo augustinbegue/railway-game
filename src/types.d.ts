@@ -17,6 +17,9 @@ export interface Station {
     position: Position;
     linesIndex: number[];
     linkedTo: number[];
+    size: number;
+    circle?: any;
+    text?: any;
 }
 
 // Graph Edges
@@ -24,7 +27,7 @@ export interface Link {
     from: number;
     to: number;
     tracks: number;
-    line: Two.Line;
+    lines: Two.Line[];
 }
 
 export interface Line {
