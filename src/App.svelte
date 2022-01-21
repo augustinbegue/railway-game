@@ -4,6 +4,7 @@
     import { GameRenderer } from "./modules/renderer";
     import type { Map, Line, Station, Link, Position } from "./types";
     import Two from "two.js";
+    import IconBarMenus from "./components/IconBarMenus.svelte";
 
     let map: Map = {
         width: 10000,
@@ -181,7 +182,7 @@
                     (mouse.x - renderer.two.scene.translation.x) /
                         renderer.two.scene.scale,
                     (mouse.y - renderer.two.scene.translation.y) /
-                        renderer.two.scene.scale,
+                        renderer.two.scene.scale
                 );
 
                 for (let i = 0; i < stations.length; i++) {
@@ -189,7 +190,7 @@
 
                     let v = new Two.Vector(
                         station.position.x - correctedMouse.x,
-                        station.position.y - correctedMouse.y,
+                        station.position.y - correctedMouse.y
                     );
 
                     const dist = Math.sqrt(Math.pow(v.x, 2) + Math.pow(v.y, 2));
@@ -215,7 +216,8 @@
 
 {#if renderer}
     <div class="h-full w-full absolute z-10">
-        <div class="h-full w-full container mx-auto flex flex-col-reverse ">
+        <IconBarMenus {lines} />
+        <div class="absolute w-full bottom-0">
             <StationContextMenu
                 {renderer}
                 open={stationContextMenuOpen}
@@ -225,7 +227,7 @@
     </div>
 {/if}
 
-<style lang="postcss">
+<style lang="postcss" global>
     @tailwind base;
     @tailwind components;
     @tailwind utilities;

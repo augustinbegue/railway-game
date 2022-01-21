@@ -32,7 +32,7 @@
 </script>
 
 {#if station && open}
-    <div class="container">
+    <div class="m-4 p-4 rounded bg-dark-200 text-white flex flex-col">
         <span class="title">{station.name}</span>
         <div class="subcontainer">
             <div>
@@ -47,13 +47,13 @@
                                 >Tracks: <input
                                     type="number"
                                     value={renderer.links[i].find(
-                                        (l) => l.to === parseInt(station.id),
+                                        (l) => l.to === parseInt(station.id)
                                     ).tracks}
                                     on:change={(e) =>
                                         setTrackNumber(
                                             i,
                                             parseInt(station.id),
-                                            e.target.value,
+                                            e.target.value
                                         )}
                                 /></span
                             >
@@ -66,10 +66,6 @@
 {/if}
 
 <style lang="postcss">
-    .container {
-        @apply m-4 p-4 rounded bg-slate-500 text-white flex flex-col;
-    }
-
     .title {
         @apply text-2xl font-semibold;
     }

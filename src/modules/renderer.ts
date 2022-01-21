@@ -78,7 +78,7 @@ export class GameRenderer {
         station.text.linewidth = 0.3;
         station.text.noStroke();
         station.text.fill = "#d6d9df";
-        station.text.family = "Product Sans";
+        station.text.family = "sans-serif";
     }
 
     drawLink(from: number) {
