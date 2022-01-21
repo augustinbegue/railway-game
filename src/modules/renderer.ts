@@ -1,13 +1,15 @@
 import Two from "two.js";
-import type { Link, Station } from "../types";
+import type { Line, Link, Position, Station } from "../types";
+
 
 export class GameRenderer {
     two: Two;
 
     stations: Station[];
     links: Link[][] = [];
+    lines: Line[] = [];
 
-    constructor(stations: Station[]) {
+    constructor(stations: Station[], lines: Line[]) {
         this.two = new Two({
             fullscreen: true,
             autostart: true,
@@ -15,8 +17,11 @@ export class GameRenderer {
         this.two.appendTo(document.body);
 
         this.stations = stations;
-        for (let i = 0; i < stations.length; i++) {
-            const station = stations[i];
+        this.lines = lines;
+
+        // Init links array
+        for (let i = 0; i < this.stations.length; i++) {
+            const station = this.stations[i];
             this.links[i] = [];
 
             let tracks = 2;
@@ -27,16 +32,25 @@ export class GameRenderer {
                     from: i,
                     to: station.linkedTo[j],
                     tracks: tracks,
-                    lines: [],
                 };
 
                 this.links[i].push(link);
             }
         }
 
+        this.draw();
+    }
+
+    draw() {
+        // Reset scene drawing states
+        this.two.clear();
+        for (let i = 0; i < this.links.length; i++) {
+            this.links[i].forEach((l) => l.drawn = false);
+        }
+
         // Draw each link between stations
-        for (let i = 0; i < stations.length; i++) {
-            const station = stations[i];
+        for (let i = 0; i < this.stations.length; i++) {
+            const station = this.stations[i];
 
             for (let j = 0; j < station.linkedTo.length; j++) {
                 this.drawLink(i);
@@ -44,12 +58,13 @@ export class GameRenderer {
         }
 
         // Draw each station
-        for (let i = 0; i < stations.length; i++) {
-            this.drawStation(stations[i]);
+        for (let i = 0; i < this.stations.length; i++) {
+            this.drawStation(this.stations[i]);
         }
     }
 
-    drawStation(station: Station) {
+    drawStation(station: Station, fill = "#8f9ebf") {
+        // TODO: Implement station colors
 
         if (station.circle) {
             station.circle.remove();
@@ -60,7 +75,7 @@ export class GameRenderer {
             station.size,
         ) as any;
 
-        station.circle.fill = "#8f9ebf";
+        station.circle.fill = fill;
         station.circle.clip = false;
         station.circle.noStroke();
 
@@ -87,36 +102,82 @@ export class GameRenderer {
         for (let i = 0; i < linkAdjList.length; i++) {
             const link = linkAdjList[i];
 
-            if (link.lines.length != 0) {
-                continue;
+            let linesUsingLink = this.getLinesUsingLink(link);
+
+            if (!link.drawn) {
+                if (linesUsingLink.length > 0 && !linesUsingLink.every(l => l.hidden)) {
+                    this.drawTracks(link, 8, linesUsingLink.filter(l => !l.hidden).map(l => l.color), 1)
+                    link.drawn = true;
+                } else {
+                    this.drawTracks(link, 1);
+                    link.drawn = true;
+                    let oppositelink = this.links[link.to].find((l) => l.to === link.from);
+                    oppositelink.drawn = true;
+                }
             }
+        }
+    }
 
-            let fromStation = this.stations[from];
-            let toStation = this.stations[link.to];
+    private drawTracks(link: Link, width: number, colors = ["#626c80"], count?): Two.Line[] {
+        let fromStation = this.stations[link.from];
+        let toStation = this.stations[link.to];
 
-            let fromPosition = fromStation.position;
-            let toPosition = toStation.position;
+        let fromPosition = fromStation.position;
+        let toPosition = toStation.position;
 
-            let angle = Math.atan2(
-                toPosition.y - fromPosition.y,
-                toPosition.x - fromPosition.x,
-            );
+        let angle = Math.atan2(
+            toPosition.y - fromPosition.y,
+            toPosition.x - fromPosition.x,
+        );
 
-            let offset = -(link.tracks - 1);
+        let num = count || link.tracks;
 
-            let oppositelink = this.links[link.to].find((l) => l.to === from);
-            for (let t = 0; t < link.tracks; t++, offset += 2) {
-                link.lines[t] = this.two.makeLine(
+
+        let lines = [];
+        if (colors.length === 1) {
+            let offset = -(num - 1);
+            let color = colors[0];
+            for (let t = 0; t < num; t++, offset += 2) {
+                let line = this.two.makeLine(
                     fromPosition.x - offset * Math.sin(angle),
                     fromPosition.y + offset * Math.cos(angle),
                     toPosition.x - offset * Math.sin(angle),
                     toPosition.y + offset * Math.cos(angle),
                 );
-                link.lines[t].linewidth = 1;
-                link.lines[t].stroke = "#626c80";
-
-                oppositelink.lines[t] = link.lines[t];
+                line.linewidth = width;
+                line.stroke = color;
+                lines.push(line);
+            }
+        } else {
+            let offset = 0;
+            for (let i = 0; i < colors.length; i++, offset += 20 / colors.length) {
+                const color = colors[i];
+                let line = this.two.makeLine(
+                    fromPosition.x,
+                    fromPosition.y,
+                    toPosition.x,
+                    toPosition.y,
+                );
+                line.linewidth = width;
+                line.stroke = color;
+                line.dashes = [10, 10]
+                line.dashes.offset = offset;
+                lines.push(line);
             }
         }
+
+        return lines;
+    }
+
+    private getLinesUsingLink(link: Link) {
+        return this.lines.filter((l) => {
+            let f = l.stations.indexOf(link.from);
+            if (l.stations[f + 1] === link.to) {
+                return true;
+            } else {
+                f = l.stations.indexOf(link.to)
+                return l.stations[f + 1] === link.from;
+            }
+        });
     }
 }

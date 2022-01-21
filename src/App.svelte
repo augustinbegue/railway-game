@@ -117,12 +117,23 @@
         {
             id: "1",
             name: "RER A",
-            stations: [4, 0, 1, 3, 2],
+            stations: [8, 4, 0, 1, 3, 2],
+            color: "#da291c",
+            hidden: false,
         },
         {
             id: "2",
             name: "RER B",
             stations: [6, 1, 5],
+            color: "#7ba4db",
+            hidden: true,
+        },
+        {
+            id: "4",
+            name: "RER D",
+            stations: [7, 0, 1, 5],
+            color: "#007a53",
+            hidden: true,
         },
     ];
 
@@ -135,7 +146,7 @@
     let stationContextMenuOpen: boolean = false;
 
     onMount(() => {
-        renderer = new GameRenderer(stations);
+        renderer = new GameRenderer(stations, lines);
 
         document.body.onwheel = (e) => {
             renderer.two.scene.scale -= e.deltaY / 500;
@@ -216,7 +227,7 @@
 
 {#if renderer}
     <div class="h-full w-full absolute z-10">
-        <IconBarMenus {lines} />
+        <IconBarMenus {renderer} />
         <div class="absolute w-full bottom-0">
             <StationContextMenu
                 {renderer}

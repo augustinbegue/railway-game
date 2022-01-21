@@ -1,5 +1,3 @@
-import Two from "two.js";
-
 export interface Position {
     x: number;
     y: number;
@@ -27,12 +25,14 @@ export interface Link {
     from: number;
     to: number;
     tracks: number;
-    lines: Two.Line[];
+    drawn?: boolean;
 }
 
 export interface Line {
     id: string;
     name: string;
+    color: string;
     stations: number[];
+    hidden: boolean;
 }
 

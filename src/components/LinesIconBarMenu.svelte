@@ -1,18 +1,20 @@
 <script lang="ts">
-    import type { Line } from "../types";
+    import type { GameRenderer } from "../modules/renderer";
+    export let renderer: GameRenderer;
 
     function toggleLine(el: HTMLElement, lineIndex: number) {
         let child = el.childNodes[0] as HTMLElement;
 
         child.classList.toggle("fa-eye");
         child.classList.toggle("fa-eye-slash");
-    }
 
-    export let lines: Line[];
+        renderer.lines[lineIndex].hidden = !renderer.lines[lineIndex].hidden;
+        renderer.draw();
+    }
 </script>
 
 <div class="bg-dark-200 p-4 m-2 rounded flex flex-col text-dark-500">
-    {#each lines as line, i}
+    {#each renderer.lines as line, i}
         <div
             class="py-2 first:pt-0 last:pb-0 inline-flex justify-evenly items-center"
         >
@@ -22,7 +24,10 @@
                     toggleLine(ev.target, i);
                 }}
             >
-                <i class="far fa-eye pointer-events-none" />
+                <i
+                    class="far pointer-events-none 
+                    {line.hidden ? 'fa-eye-slash' : 'fa-eye'}"
+                />
             </button>
             <span>
                 {line.name}

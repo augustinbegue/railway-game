@@ -1,9 +1,9 @@
 <script lang="ts">
-    import type { Line } from "../types";
+    import type { GameRenderer } from "../modules/renderer";
 
     import LinesIconBarMenu from "./LinesIconBarMenu.svelte";
 
-    export let lines: Line[];
+    export let renderer: GameRenderer;
 </script>
 
 <div class="icon-bar">
@@ -11,7 +11,7 @@
         <button class="icon-bar-button">Lines</button>
     </div>
     <div>
-        <LinesIconBarMenu {lines} />
+        <LinesIconBarMenu {renderer} />
     </div>
 </div>
 
