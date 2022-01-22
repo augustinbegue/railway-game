@@ -7,6 +7,7 @@ export class GameRenderer {
 
     stations: Station[];
     links: Link[][] = [];
+    tracks: Two.Line[][][] = [];
     lines: Line[] = [];
 
     constructor(stations: Station[], lines: Line[]) {
@@ -15,14 +16,16 @@ export class GameRenderer {
             autostart: true,
         });
         this.two.appendTo(document.body);
+        this.two.bind('update', this.update);
 
         this.stations = stations;
         this.lines = lines;
 
-        // Init links array
+        // Init links and tracks array
         for (let i = 0; i < this.stations.length; i++) {
             const station = this.stations[i];
             this.links[i] = [];
+            this.tracks[i] = [];
 
             let tracks = 2;
 
@@ -35,6 +38,7 @@ export class GameRenderer {
                 };
 
                 this.links[i].push(link);
+                this.tracks[i][link.to] = [];
             }
         }
 
@@ -57,10 +61,26 @@ export class GameRenderer {
             }
         }
 
+        console.log(this.tracks)
+
         // Draw each station
         for (let i = 0; i < this.stations.length; i++) {
             this.drawStation(this.stations[i]);
         }
+    }
+
+    percent = 0;
+    update(frameCount: number, timeDelta: number) {
+        // Train Animation
+        if (!this.links) {
+            return;
+        }
+
+        if (!this.links[0][0].drawn) {
+            return;
+        }
+
+        let link = this.links[0][0];
     }
 
     drawStation(station: Station, fill = "#8f9ebf") {
@@ -105,14 +125,18 @@ export class GameRenderer {
             let linesUsingLink = this.getLinesUsingLink(link);
 
             if (!link.drawn) {
+                this.tracks[link.from][link.to] = [];
+                this.tracks[link.to][link.from] = [];
                 if (linesUsingLink.length > 0 && !linesUsingLink.every(l => l.hidden)) {
                     this.drawTracks(link, 8, linesUsingLink.filter(l => !l.hidden).map(l => l.color), 1)
                     link.drawn = true;
                 } else {
-                    this.drawTracks(link, 1);
+                    let lines = this.drawTracks(link, 1);
                     link.drawn = true;
                     let oppositelink = this.links[link.to].find((l) => l.to === link.from);
                     oppositelink.drawn = true;
+                    this.tracks[link.from][link.to] = lines;
+                    this.tracks[link.to][link.from] = lines;
                 }
             }
         }
@@ -135,6 +159,7 @@ export class GameRenderer {
 
         let lines = [];
         if (colors.length === 1) {
+            // In this case, we draw the actual tracks
             let offset = -(num - 1);
             let color = colors[0];
             for (let t = 0; t < num; t++, offset += 2) {
@@ -149,6 +174,7 @@ export class GameRenderer {
                 lines.push(line);
             }
         } else {
+            // In this case, we draw the network lines
             let offset = 0;
             for (let i = 0; i < colors.length; i++, offset += 20 / colors.length) {
                 const color = colors[i];
