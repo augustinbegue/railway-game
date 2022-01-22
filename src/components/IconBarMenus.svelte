@@ -21,6 +21,6 @@
     }
 
     .icon-bar-button {
-        @apply py-2 px-4 m-2 rounded-full font-semibold text-dark-500 hover:text-white focus:text-white bg-dark-200 hover:bg-dark-300 focus:bg-dark-300 transition-all;
+        @apply py-2 px-4 m-2 rounded-full font-semibold text-dark-500 hover:text-white focus:text-white bg-dark-100 hover:bg-dark-200 focus:bg-dark-200 transition-all;
     }
 </style>

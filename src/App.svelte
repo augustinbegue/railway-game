@@ -5,6 +5,7 @@
     import type { Map, Line, Station, Link, Position } from "./types";
     import Two from "two.js";
     import IconBarMenus from "./components/IconBarMenus.svelte";
+    import TimeDisplayComponent from "./components/TimeDisplayComponent.svelte";
 
     let map: Map = {
         width: 10000,
@@ -120,6 +121,7 @@
             stations: [8, 4, 0, 1, 3, 2],
             color: "#da291c",
             hidden: false,
+            trains: [],
         },
         {
             id: "2",
@@ -127,6 +129,7 @@
             stations: [6, 1, 5],
             color: "#7ba4db",
             hidden: true,
+            trains: [],
         },
         {
             id: "4",
@@ -134,6 +137,7 @@
             stations: [7, 0, 1, 5],
             color: "#007a53",
             hidden: true,
+            trains: [],
         },
     ];
 
@@ -226,6 +230,9 @@
 </script>
 
 {#if renderer}
+    <div class="w-full absolute z-20">
+        <TimeDisplayComponent {renderer} />
+    </div>
     <div class="h-full w-full absolute z-10">
         <IconBarMenus {renderer} />
         <div class="absolute w-full bottom-0">

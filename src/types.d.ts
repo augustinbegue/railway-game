@@ -1,3 +1,10 @@
+import type Two from "src/two";
+
+export interface GameTime {
+    seconds: number;
+    multiplicator: number;
+}
+
 export interface Position {
     x: number;
     y: number;
@@ -34,5 +41,25 @@ export interface Line {
     color: string;
     stations: number[];
     hidden: boolean;
+    trains: Train[];
 }
 
+export interface Train {
+    stats: {
+        maxSpeed: number;
+        capacity: number;
+    };
+    schedule: {
+        startTimeSeconds: number;
+        stoppingTimeSeconds: number;
+    }
+    location: {
+        stopped: boolean;
+        stationIndex: number;
+        currentLink: Link;
+        percent: number;
+        trackIsForward: boolean;
+        reverseTrip: boolean;
+    };
+    element: Two.Shape;
+}

@@ -13,7 +13,7 @@
     }
 </script>
 
-<div class="bg-dark-200 p-4 m-2 rounded flex flex-col text-dark-500">
+<div class="bg-dark-100 p-4 m-2 rounded flex flex-col text-dark-500">
     {#each renderer.lines as line, i}
         <div
             class="py-2 first:pt-0 last:pb-0 inline-flex justify-evenly items-center"

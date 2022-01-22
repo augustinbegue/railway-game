@@ -1,9 +1,14 @@
 import Two from "two.js";
-import type { Line, Link, Position, Station } from "../types";
+import type { GameTime, Line, Link, Position, Station } from "../types";
 
 
 export class GameRenderer {
     two: Two;
+
+    gameTime: GameTime = {
+        multiplicator: 1,
+        seconds: 12 * 60 * 60
+    };
 
     stations: Station[];
     links: Link[][] = [];
@@ -71,15 +76,20 @@ export class GameRenderer {
         }
     }
 
-    percent: number;
+
+    // TODO: Remove
+    percent = 0;
     element: Two.Ellipse;
     currentLink: Link;
-    currentTrack: Two.Line;
     stationIndex: number;
     trackIsForward = true;
     reverseTrip = false;
 
     update(frameCount: number, timeDelta: number) {
+        // Updating GameTime
+        this.gameTime.seconds += (timeDelta / 1000) * this.gameTime.multiplicator;
+
+        // TODO: Update Trains on each line
         // Train Animation
         // Temp: making a train follow first network line
         if (!this.tracks || !this.lines[0]) {
@@ -93,8 +103,9 @@ export class GameRenderer {
             this.stationIndex = 1;
         }
 
+        let track: Two.Path;
         // Get first track of link and its direction
-        if (!this.currentTrack) {
+        if (!track) {
             this.trackIsForward = true;
             let tracks = this.tracks[this.currentLink.from][this.currentLink.to];
             if (tracks.length === 0) {
@@ -102,21 +113,22 @@ export class GameRenderer {
                 tracks = this.tracks[this.currentLink.to][this.currentLink.from];
             }
 
-            if (!tracks[0])
-                return;
-
-            this.percent = this.trackIsForward ? 0 : 100;
-            this.currentTrack = this.trackIsForward ? tracks[tracks.length - 1] : tracks[0];
+            if (tracks.length !== 0) {
+                track = this.trackIsForward ? tracks[tracks.length - 1] : tracks[0];
+            }
         }
 
-        let point = this.currentTrack.getPointAt(this.percent / 100);
         this.element?.remove();
-        this.element = this.two.makeCircle(point.x, point.y, 1, 1);
+        if (track) {
+            let point = track.getPointAt(this.trackIsForward ? (this.percent / 100) : 1 - (this.percent / 100));
+            this.element = this.two.makeCircle(point.x, point.y, 1, 1);
+        }
 
-        this.percent = this.trackIsForward ? this.percent + 0.05 * timeDelta : this.percent - 0.05 * timeDelta;
+        this.percent = this.percent + 0.01 * timeDelta;
 
         // Ended -> Get the next link
-        if (this.percent > 100 || this.percent < 0) {
+        if (this.percent > 100) {
+            this.percent = 0;
             let currentStation = line.stations[this.stationIndex];
             this.stationIndex = this.reverseTrip ? this.stationIndex - 1 : this.stationIndex + 1;
 
@@ -135,7 +147,7 @@ export class GameRenderer {
 
             // Get the next link
             this.currentLink = this.links[currentStation].find(l => l.to === newStation);
-            this.currentTrack = undefined;
+            track = undefined;
 
             console.log(`Now going to station ${this.stations[newStation].name}`);
         }

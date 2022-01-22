@@ -65,7 +65,7 @@
 </script>
 
 {#if station && open}
-    <div class="m-4 p-4 rounded bg-dark-200 text-slate-200 flex flex-col">
+    <div class="m-4 p-4 rounded bg-dark-100 text-slate-200 flex flex-col">
         <span class="title text-white">{station.name}</span>
         <div class="subcontainer">
             <div>
@@ -81,7 +81,7 @@
                                 Tracks:
                                 <input
                                     id={`link${i}tracks`}
-                                    class="bg-dark-200 p-1 w-8"
+                                    class="bg-dark-100 p-1 w-8"
                                     type="text"
                                     value={renderer.links[i].find(
                                         (l) => l.to === parseInt(station.id)
@@ -94,7 +94,7 @@
                                         )}
                                 />
                                 <button
-                                    class="p-1 bg-dark-300 rounded leading-none hover:bg-dark-400 transition-all"
+                                    class="p-1 bg-dark-200 rounded leading-none hover:bg-dark-400 transition-all"
                                     on:click={(ev) =>
                                         increaseTrackNumber(
                                             i,
@@ -105,7 +105,7 @@
                                 </button>
 
                                 <button
-                                    class="p-1 bg-dark-300 rounded leading-none hover:bg-dark-400 transition-all"
+                                    class="p-1 bg-dark-200 rounded leading-none hover:bg-dark-400 transition-all"
                                     on:click={(ev) =>
                                         decreaseTrackNumber(
                                             i,
