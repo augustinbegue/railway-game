@@ -16,7 +16,9 @@ export class GameRenderer {
             autostart: true,
         });
         this.two.appendTo(document.body);
-        this.two.bind('update', this.update);
+        this.two.bind('update', (a, b) => {
+            this.update(a, b);
+        });
 
         this.stations = stations;
         this.lines = lines;
@@ -69,18 +71,74 @@ export class GameRenderer {
         }
     }
 
-    percent = 0;
+    percent: number;
+    element: Two.Ellipse;
+    currentLink: Link;
+    currentTrack: Two.Line;
+    stationIndex: number;
+    trackIsForward = true;
+    reverseTrip = false;
+
     update(frameCount: number, timeDelta: number) {
         // Train Animation
-        if (!this.links) {
+        // Temp: making a train follow first network line
+        if (!this.tracks || !this.lines[0]) {
             return;
         }
 
-        if (!this.links[0][0].drawn) {
-            return;
+        // Get first link
+        let line = this.lines[0];
+        if (!this.currentLink) {
+            this.currentLink = this.links[line.stations[0]].find(l => l.to === line.stations[1]);
+            this.stationIndex = 1;
         }
 
-        let link = this.links[0][0];
+        // Get first track of link and its direction
+        if (!this.currentTrack) {
+            this.trackIsForward = true;
+            let tracks = this.tracks[this.currentLink.from][this.currentLink.to];
+            if (tracks.length === 0) {
+                this.trackIsForward = false;
+                tracks = this.tracks[this.currentLink.to][this.currentLink.from];
+            }
+
+            if (!tracks[0])
+                return;
+
+            this.percent = this.trackIsForward ? 0 : 100;
+            this.currentTrack = this.trackIsForward ? tracks[tracks.length - 1] : tracks[0];
+        }
+
+        let point = this.currentTrack.getPointAt(this.percent / 100);
+        this.element?.remove();
+        this.element = this.two.makeCircle(point.x, point.y, 1, 1);
+
+        this.percent = this.trackIsForward ? this.percent + 0.05 * timeDelta : this.percent - 0.05 * timeDelta;
+
+        // Ended -> Get the next link
+        if (this.percent > 100 || this.percent < 0) {
+            let currentStation = line.stations[this.stationIndex];
+            this.stationIndex = this.reverseTrip ? this.stationIndex - 1 : this.stationIndex + 1;
+
+            // Turn back
+            if (this.stationIndex >= line.stations.length) {
+                this.reverseTrip = true;
+                this.stationIndex -= 2;
+            } else if (this.stationIndex < 0) {
+                this.reverseTrip = false;
+                this.stationIndex = 0;
+            }
+
+            let newStation = line.stations[this.stationIndex];
+
+            console.log(`Reached station ${this.stations[currentStation].name}`);
+
+            // Get the next link
+            this.currentLink = this.links[currentStation].find(l => l.to === newStation);
+            this.currentTrack = undefined;
+
+            console.log(`Now going to station ${this.stations[newStation].name}`);
+        }
     }
 
     drawStation(station: Station, fill = "#8f9ebf") {
@@ -136,7 +194,6 @@ export class GameRenderer {
                     let oppositelink = this.links[link.to].find((l) => l.to === link.from);
                     oppositelink.drawn = true;
                     this.tracks[link.from][link.to] = lines;
-                    this.tracks[link.to][link.from] = lines;
                 }
             }
         }
