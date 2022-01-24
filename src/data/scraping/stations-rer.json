@@ -1,0 +1,1745 @@
+[
+    {
+        "stationName": "Cergy-le-Haut",
+        "coordinates": {
+            "lat": "49.04833333333333",
+            "long": "2.0116666666666667"
+        }
+    },
+    {
+        "stationName": "Cergy-Saint-Christophe",
+        "coordinates": {
+            "lat": "49.04972222222222",
+            "long": "2.0344444444444445"
+        }
+    },
+    {
+        "stationName": "Cergy-Préfecture",
+        "coordinates": {
+            "lat": "49.03611111111111",
+            "long": "2.080277777777778"
+        }
+    },
+    {
+        "stationName": "Neuville-Université",
+        "coordinates": {
+            "lat": "49.01416666666667",
+            "long": "2.0783333333333336"
+        }
+    },
+    {
+        "stationName": "Conflans-Fin-d'Oise",
+        "coordinates": {
+            "lat": "48.990833333333335",
+            "long": "2.073888888888889"
+        }
+    },
+    {
+        "stationName": "Achères-Ville",
+        "coordinates": {
+            "lat": "48.97",
+            "long": "2.077777777777778"
+        }
+    },
+    {
+        "stationName": "Poissy",
+        "coordinates": {
+            "lat": "48.933055555555555",
+            "long": "2.041111111111111"
+        }
+    },
+    {
+        "stationName": "Achères - Grand-Cormier",
+        "coordinates": {
+            "lat": "48.95527777777778",
+            "long": "2.0919444444444446"
+        }
+    },
+    {
+        "stationName": "Maisons-Laffitte",
+        "coordinates": {
+            "lat": "48.94583333333333",
+            "long": "2.1441666666666666"
+        }
+    },
+    {
+        "stationName": "Sartrouville",
+        "coordinates": {
+            "lat": "48.9375",
+            "long": "2.157222222222222"
+        }
+    },
+    {
+        "stationName": "Houilles - Carrières-sur-Seine",
+        "coordinates": {
+            "lat": "48.920833333333334",
+            "long": "2.1844444444444444"
+        }
+    },
+    {
+        "stationName": "Saint-Germain-en-Laye",
+        "coordinates": {
+            "lat": "48.89833333333333",
+            "long": "2.0947222222222224"
+        }
+    },
+    {
+        "stationName": "Le Vésinet - Le Pecq",
+        "coordinates": {
+            "lat": "48.89833333333333",
+            "long": "2.1219444444444444"
+        }
+    },
+    {
+        "stationName": "Le Vésinet-Centre",
+        "coordinates": {
+            "lat": "48.890277777777776",
+            "long": "2.1344444444444446"
+        }
+    },
+    {
+        "stationName": "Chatou - Croissy",
+        "coordinates": {
+            "lat": "48.88527777777778",
+            "long": "2.156111111111111"
+        }
+    },
+    {
+        "stationName": "Rueil-Malmaison",
+        "coordinates": {
+            "lat": "48.88722222222222",
+            "long": "2.1713888888888886"
+        }
+    },
+    {
+        "stationName": "Nanterre-Ville",
+        "coordinates": {
+            "lat": "48.89527777777778",
+            "long": "2.1955555555555555"
+        }
+    },
+    {
+        "stationName": "Nanterre-Université",
+        "coordinates": {
+            "lat": "48.90138888888889",
+            "long": "2.2147222222222225"
+        }
+    },
+    {
+        "stationName": "Nanterre-Préfecture",
+        "coordinates": {
+            "lat": "48.89555555555555",
+            "long": "2.223055555555556"
+        }
+    },
+    {
+        "stationName": "La Défense\nGrande Arche",
+        "coordinates": {
+            "lat": "48.89194444444444",
+            "long": "2.238611111111111"
+        }
+    },
+    {
+        "stationName": "Charles-de-Gaulle - Étoile",
+        "coordinates": {
+            "lat": "48.87361111111111",
+            "long": "2.295"
+        }
+    },
+    {
+        "stationName": "Auber",
+        "coordinates": {
+            "lat": "48.87305555555555",
+            "long": "2.328888888888889"
+        }
+    },
+    {
+        "stationName": "Châtelet - Les Halles",
+        "coordinates": {
+            "lat": "48.86138888888889",
+            "long": "2.346388888888889"
+        }
+    },
+    {
+        "stationName": "Paris-Gare-de-Lyon",
+        "coordinates": {
+            "lat": "48.844722222222224",
+            "long": "2.3736111111111113"
+        }
+    },
+    {
+        "stationName": "Nation",
+        "coordinates": {
+            "lat": "48.848333333333336",
+            "long": "2.3958333333333335"
+        }
+    },
+    {
+        "stationName": "Vincennes",
+        "coordinates": {
+            "lat": "48.847500000000004",
+            "long": "2.4336111111111114"
+        }
+    },
+    {
+        "stationName": "Fontenay-sous-Bois",
+        "coordinates": {
+            "lat": "48.843611111111116",
+            "long": "2.463888888888889"
+        }
+    },
+    {
+        "stationName": "Nogent-sur-Marne",
+        "coordinates": {
+            "lat": "48.83527777777778",
+            "long": "2.4716666666666667"
+        }
+    },
+    {
+        "stationName": "Joinville-le-Pont",
+        "coordinates": {
+            "lat": "48.82027777777778",
+            "long": "2.463611111111111"
+        }
+    },
+    {
+        "stationName": "Saint-Maur - Créteil",
+        "coordinates": {
+            "lat": "48.80638888888888",
+            "long": "2.4722222222222223"
+        }
+    },
+    {
+        "stationName": "Le Parc de Saint-Maur",
+        "coordinates": {
+            "lat": "48.805",
+            "long": "2.4855555555555555"
+        }
+    },
+    {
+        "stationName": "Champigny\nSaint-Maur",
+        "coordinates": {
+            "lat": "48.80722222222222",
+            "long": "2.5097222222222224"
+        }
+    },
+    {
+        "stationName": "La Varenne - Chennevières",
+        "coordinates": {
+            "lat": "48.79527777777778",
+            "long": "2.5141666666666667"
+        }
+    },
+    {
+        "stationName": "Sucy - Bonneuil",
+        "coordinates": {
+            "lat": "48.77111111111111",
+            "long": "2.5075"
+        }
+    },
+    {
+        "stationName": "Boissy-Saint-Léger",
+        "coordinates": {
+            "lat": "48.75277777777778",
+            "long": "2.505"
+        }
+    },
+    {
+        "stationName": "Val de Fontenay",
+        "coordinates": {
+            "lat": "48.85444444444445",
+            "long": "2.4891666666666667"
+        }
+    },
+    {
+        "stationName": "Neuilly-Plaisance",
+        "coordinates": {
+            "lat": "48.85333333333333",
+            "long": "2.513611111111111"
+        }
+    },
+    {
+        "stationName": "Bry-sur-Marne (RATP)",
+        "coordinates": {
+            "lat": "48.84444444444445",
+            "long": "2.526111111111111"
+        }
+    },
+    {
+        "stationName": "Noisy-le-Grand-Mont d'Est",
+        "coordinates": {
+            "lat": "48.84055555555556",
+            "long": "2.5480555555555555"
+        }
+    },
+    {
+        "stationName": "Noisy - Champs\nChampy - Nesles",
+        "coordinates": {
+            "lat": "48.84277777777778",
+            "long": "2.5799999999999996"
+        }
+    },
+    {
+        "stationName": "Noisiel\nLe Luzard",
+        "coordinates": {
+            "lat": "48.843333333333334",
+            "long": "2.6166666666666667"
+        }
+    },
+    {
+        "stationName": "Lognes\nLe Mandinet",
+        "coordinates": {
+            "lat": "48.83888888888889",
+            "long": "2.633888888888889"
+        }
+    },
+    {
+        "stationName": "Torcy",
+        "coordinates": {
+            "lat": "48.839444444444446",
+            "long": "2.654722222222222"
+        }
+    },
+    {
+        "stationName": "Bussy-Saint-Georges",
+        "coordinates": {
+            "lat": "48.83638888888889",
+            "long": "2.7094444444444448"
+        }
+    },
+    {
+        "stationName": "Serris - Montévrain\nVal d'Europe",
+        "coordinates": {
+            "lat": "48.85527777777778",
+            "long": "2.7733333333333334"
+        }
+    },
+    {
+        "stationName": "Marne-la-Vallée - Chessy",
+        "coordinates": {
+            "lat": "48.87",
+            "long": "2.7827777777777776"
+        }
+    },
+    {
+        "stationName": "Aéroport Charles-de-Gaulle 2 TGV",
+        "coordinates": {
+            "lat": "49.00361111111111",
+            "long": "2.5708333333333333"
+        }
+    },
+    {
+        "stationName": "Aéroport Charles-de-Gaulle 1",
+        "coordinates": {
+            "lat": "49.01",
+            "long": "2.5605555555555553"
+        }
+    },
+    {
+        "stationName": "Parc des Expositions",
+        "coordinates": {
+            "lat": "48.97416666666667",
+            "long": "2.5155555555555558"
+        }
+    },
+    {
+        "stationName": "Villepinte\nParc du Sausset",
+        "coordinates": {
+            "lat": "48.963055555555556",
+            "long": "2.5119444444444445"
+        }
+    },
+    {
+        "stationName": "Sevran - Beaudottes",
+        "coordinates": {
+            "lat": "48.948055555555555",
+            "long": "2.5244444444444443"
+        }
+    },
+    {
+        "stationName": "Mitry - Claye",
+        "coordinates": {
+            "lat": "48.975833333333334",
+            "long": "2.6425"
+        }
+    },
+    {
+        "stationName": "Villeparisis - Mitry-le-Neuf",
+        "coordinates": {
+            "lat": "48.95305555555556",
+            "long": "2.602777777777778"
+        }
+    },
+    {
+        "stationName": "Vert-Galant",
+        "coordinates": {
+            "lat": "48.943888888888885",
+            "long": "2.5666666666666664"
+        }
+    },
+    {
+        "stationName": "Sevran - Livry",
+        "coordinates": {
+            "lat": "48.93611111111111",
+            "long": "2.5347222222222223"
+        }
+    },
+    {
+        "stationName": "Aulnay-sous-Bois",
+        "coordinates": {
+            "lat": "48.93222222222222",
+            "long": "2.4958333333333336"
+        }
+    },
+    {
+        "stationName": "Le Blanc-Mesnil",
+        "coordinates": {
+            "lat": "48.9325",
+            "long": "2.477222222222222"
+        }
+    },
+    {
+        "stationName": "Drancy",
+        "coordinates": {
+            "lat": "48.93277777777777",
+            "long": "2.4547222222222222"
+        }
+    },
+    {
+        "stationName": "Le Bourget",
+        "coordinates": {
+            "lat": "48.93055555555555",
+            "long": "2.4258333333333333"
+        }
+    },
+    {
+        "stationName": "La Courneuve - Aubervilliers",
+        "coordinates": {
+            "lat": "48.92388888888889",
+            "long": "2.3844444444444446"
+        }
+    },
+    {
+        "stationName": "La Plaine - Stade de France\nSaint-Denis - Aubervilliers",
+        "coordinates": {
+            "lat": "48.918055555555554",
+            "long": "2.3625000000000003"
+        }
+    },
+    {
+        "stationName": "Paris-Nord",
+        "coordinates": {
+            "lat": "48.88166666666667",
+            "long": "2.3561111111111113"
+        }
+    },
+    {
+        "stationName": "Saint-Michel - Notre-Dame",
+        "coordinates": {
+            "lat": "48.853611111111114",
+            "long": "2.3441666666666667"
+        }
+    },
+    {
+        "stationName": "Luxembourg\nSénat",
+        "coordinates": {
+            "lat": "48.84666666666667",
+            "long": "2.340277777777778"
+        }
+    },
+    {
+        "stationName": "Port-Royal",
+        "coordinates": {
+            "lat": "48.84",
+            "long": "2.336666666666667"
+        }
+    },
+    {
+        "stationName": "Denfert-Rochereau\nColonel Rol-Tanguy",
+        "coordinates": {
+            "lat": "48.83388888888889",
+            "long": "2.3327777777777774"
+        }
+    },
+    {
+        "stationName": "Cité universitaire",
+        "coordinates": {
+            "lat": "48.82055555555556",
+            "long": "2.338888888888889"
+        }
+    },
+    {
+        "stationName": "Gentilly",
+        "coordinates": {
+            "lat": "48.816111111111105",
+            "long": "2.3405555555555555"
+        }
+    },
+    {
+        "stationName": "Laplace\nMaison des Examens",
+        "coordinates": {
+            "lat": "48.8075",
+            "long": "2.333055555555555"
+        }
+    },
+    {
+        "stationName": "Arcueil - Cachan",
+        "coordinates": {
+            "lat": "48.79944444444444",
+            "long": "2.328333333333333"
+        }
+    },
+    {
+        "stationName": "Bagneux",
+        "coordinates": {
+            "lat": "48.79333333333333",
+            "long": "2.3213888888888885"
+        }
+    },
+    {
+        "stationName": "Bourg-la-Reine",
+        "coordinates": {
+            "lat": "48.780277777777776",
+            "long": "2.312222222222222"
+        }
+    },
+    {
+        "stationName": "Sceaux",
+        "coordinates": {
+            "lat": "48.78138888888889",
+            "long": "2.297222222222222"
+        }
+    },
+    {
+        "stationName": "Fontenay-aux-Roses",
+        "coordinates": {
+            "lat": "48.7875",
+            "long": "2.292222222222222"
+        }
+    },
+    {
+        "stationName": "Robinson",
+        "coordinates": {
+            "lat": "48.780277777777776",
+            "long": "2.281111111111111"
+        }
+    },
+    {
+        "stationName": "Parc de Sceaux",
+        "coordinates": {
+            "lat": "48.770833333333336",
+            "long": "2.3102777777777774"
+        }
+    },
+    {
+        "stationName": "La Croix de Berny",
+        "coordinates": {
+            "lat": "48.761944444444445",
+            "long": "2.304722222222222"
+        }
+    },
+    {
+        "stationName": "Antony",
+        "coordinates": {
+            "lat": "48.755",
+            "long": "2.3008333333333333"
+        }
+    },
+    {
+        "stationName": "Fontaine Michalon",
+        "coordinates": {
+            "lat": "48.74333333333333",
+            "long": "2.2963888888888886"
+        }
+    },
+    {
+        "stationName": "Les Baconnets",
+        "coordinates": {
+            "lat": "48.739444444444445",
+            "long": "2.2875"
+        }
+    },
+    {
+        "stationName": "Massy - Verrières",
+        "coordinates": {
+            "lat": "48.73416666666667",
+            "long": "2.2736111111111112"
+        }
+    },
+    {
+        "stationName": "Massy - Palaiseau",
+        "coordinates": {
+            "lat": "48.723888888888894",
+            "long": "2.2594444444444446"
+        }
+    },
+    {
+        "stationName": "Palaiseau",
+        "coordinates": {
+            "lat": "48.717777777777776",
+            "long": "2.2466666666666666"
+        }
+    },
+    {
+        "stationName": "Palaiseau - Villebon",
+        "coordinates": {
+            "lat": "48.70777777777778",
+            "long": "2.2372222222222224"
+        }
+    },
+    {
+        "stationName": "Lozère\nÉcole polytechnique",
+        "coordinates": {
+            "lat": "48.70583333333334",
+            "long": "2.2119444444444447"
+        }
+    },
+    {
+        "stationName": "Le Guichet",
+        "coordinates": {
+            "lat": "48.705000000000005",
+            "long": "2.191111111111111"
+        }
+    },
+    {
+        "stationName": "Orsay-Ville",
+        "coordinates": {
+            "lat": "48.6975",
+            "long": "2.1819444444444445"
+        }
+    },
+    {
+        "stationName": "Bures-sur-Yvette",
+        "coordinates": {
+            "lat": "48.69555555555555",
+            "long": "2.1630555555555553"
+        }
+    },
+    {
+        "stationName": "La Hacquinière",
+        "coordinates": {
+            "lat": "48.69472222222222",
+            "long": "2.1530555555555555"
+        }
+    },
+    {
+        "stationName": "Gif-sur-Yvette",
+        "coordinates": {
+            "lat": "48.69833333333333",
+            "long": "2.1366666666666667"
+        }
+    },
+    {
+        "stationName": "Courcelle-sur-Yvette",
+        "coordinates": {
+            "lat": "48.700833333333335",
+            "long": "2.0991666666666666"
+        }
+    },
+    {
+        "stationName": "Saint-Rémy-lès-Chevreuse",
+        "coordinates": {
+            "lat": "48.70277777777778",
+            "long": "2.0708333333333337"
+        }
+    },
+    {
+        "stationName": "Pontoise",
+        "coordinates": {
+            "lat": "49.04666666666667",
+            "long": "2.095277777777778"
+        }
+    },
+    {
+        "stationName": "Saint-Ouen-l'Aumône",
+        "coordinates": {
+            "lat": "49.04555555555555",
+            "long": "2.106388888888889"
+        }
+    },
+    {
+        "stationName": "Saint-Ouen-l'Aumône-Liesse",
+        "coordinates": {
+            "lat": "49.034166666666664",
+            "long": "2.1277777777777778"
+        }
+    },
+    {
+        "stationName": "Pierrelaye",
+        "coordinates": {
+            "lat": "49.019444444444446",
+            "long": "2.153611111111111"
+        }
+    },
+    {
+        "stationName": "Montigny - Beauchamp",
+        "coordinates": {
+            "lat": "49.0075",
+            "long": "2.1977777777777776"
+        }
+    },
+    {
+        "stationName": "Franconville - Le Plessis-Bouchard",
+        "coordinates": {
+            "lat": "48.99333333333333",
+            "long": "2.235"
+        }
+    },
+    {
+        "stationName": "Cernay",
+        "coordinates": {
+            "lat": "48.985",
+            "long": "2.257222222222222"
+        }
+    },
+    {
+        "stationName": "Ermont - Eaubonne",
+        "coordinates": {
+            "lat": "48.980555555555554",
+            "long": "2.2713888888888887"
+        }
+    },
+    {
+        "stationName": "Saint-Gratien",
+        "coordinates": {
+            "lat": "48.96388888888889",
+            "long": "2.2852777777777775"
+        }
+    },
+    {
+        "stationName": "Épinay-sur-Seine",
+        "coordinates": {
+            "lat": "48.95416666666667",
+            "long": "2.302222222222222"
+        }
+    },
+    {
+        "stationName": "Gennevilliers",
+        "coordinates": {
+            "lat": "48.93333333333333",
+            "long": "2.3077777777777775"
+        }
+    },
+    {
+        "stationName": "Les Grésillons",
+        "coordinates": {
+            "lat": "48.919999999999995",
+            "long": "2.3141666666666665"
+        }
+    },
+    {
+        "stationName": "Saint-Ouen",
+        "coordinates": {
+            "lat": "48.905277777777776",
+            "long": "2.3225"
+        }
+    },
+    {
+        "stationName": "Porte de Clichy\nTribunal de Paris",
+        "coordinates": {
+            "lat": "48.89416666666666",
+            "long": "2.315"
+        }
+    },
+    {
+        "stationName": "Pereire - Levallois",
+        "coordinates": {
+            "lat": "48.88583333333333",
+            "long": "2.2975"
+        }
+    },
+    {
+        "stationName": "Neuilly - Porte Maillot\nPalais des Congrès",
+        "coordinates": {
+            "lat": "48.87777777777778",
+            "long": "2.2816666666666667"
+        }
+    },
+    {
+        "stationName": "Avenue Foch",
+        "coordinates": {
+            "lat": "48.870555555555555",
+            "long": "2.2752777777777777"
+        }
+    },
+    {
+        "stationName": "Avenue Henri-Martin",
+        "coordinates": {
+            "lat": "48.86388888888889",
+            "long": "2.272222222222222"
+        }
+    },
+    {
+        "stationName": "Boulainvilliers",
+        "coordinates": {
+            "lat": "48.85638888888889",
+            "long": "2.2752777777777777"
+        }
+    },
+    {
+        "stationName": "Avenue du Président-Kennedy\nMaison de Radio-France",
+        "coordinates": {
+            "lat": "48.85333333333333",
+            "long": "2.28"
+        }
+    },
+    {
+        "stationName": "Saint-Quentin-en-Yvelines\nMontigny-le-Bretonneux",
+        "coordinates": {
+            "lat": "48.7875",
+            "long": "2.0444444444444443"
+        }
+    },
+    {
+        "stationName": "Saint-Cyr",
+        "coordinates": {
+            "lat": "48.79888888888889",
+            "long": "2.0736111111111115"
+        }
+    },
+    {
+        "stationName": "Versailles-Chantiers",
+        "coordinates": {
+            "lat": "48.795833333333334",
+            "long": "2.1358333333333333"
+        }
+    },
+    {
+        "stationName": "Versailles-Château-Rive-Gauche",
+        "coordinates": {
+            "lat": "48.80027777777777",
+            "long": "2.129166666666667"
+        }
+    },
+    {
+        "stationName": "Porchefontaine",
+        "coordinates": {
+            "lat": "48.79666666666667",
+            "long": "2.153888888888889"
+        }
+    },
+    {
+        "stationName": "Viroflay-Rive-Gauche",
+        "coordinates": {
+            "lat": "48.800555555555555",
+            "long": "2.1713888888888886"
+        }
+    },
+    {
+        "stationName": "Chaville - Vélizy",
+        "coordinates": {
+            "lat": "48.79944444444444",
+            "long": "2.1841666666666666"
+        }
+    },
+    {
+        "stationName": "Meudon-Val-Fleury",
+        "coordinates": {
+            "lat": "48.808055555555555",
+            "long": "2.2408333333333332"
+        }
+    },
+    {
+        "stationName": "Issy",
+        "coordinates": {
+            "lat": "48.819722222222225",
+            "long": "2.2591666666666668"
+        }
+    },
+    {
+        "stationName": "Issy-Val de Seine",
+        "coordinates": {
+            "lat": "48.82972222222222",
+            "long": "2.2630555555555554"
+        }
+    },
+    {
+        "stationName": "Pont du Garigliano\nHôpital européen Georges-Pompidou",
+        "coordinates": {
+            "lat": "48.839444444444446",
+            "long": "2.2705555555555557"
+        }
+    },
+    {
+        "stationName": "Javel",
+        "coordinates": {
+            "lat": "48.84638888888889",
+            "long": "2.276944444444444"
+        }
+    },
+    {
+        "stationName": "Champ de Mars - Tour Eiffel",
+        "coordinates": {
+            "lat": "48.85666666666667",
+            "long": "2.289722222222222"
+        }
+    },
+    {
+        "stationName": "Pont de l'Alma\nMusée du quai Branly - Jacques Chirac",
+        "coordinates": {
+            "lat": "48.862500000000004",
+            "long": "2.301111111111111"
+        }
+    },
+    {
+        "stationName": "Invalides",
+        "coordinates": {
+            "lat": "48.86194444444445",
+            "long": "2.3144444444444443"
+        }
+    },
+    {
+        "stationName": "Musée d'Orsay\nAnciennement Gare d'Orsay",
+        "coordinates": {
+            "lat": "48.86027777777778",
+            "long": "2.3252777777777776"
+        }
+    },
+    {
+        "stationName": "Paris-Austerlitz",
+        "coordinates": {
+            "lat": "48.84166666666667",
+            "long": "2.366111111111111"
+        }
+    },
+    {
+        "stationName": "Bibliothèque\nFrançois-Mitterrand",
+        "coordinates": {
+            "lat": "48.82972222222222",
+            "long": "2.3769444444444443"
+        }
+    },
+    {
+        "stationName": "Ivry-sur-Seine",
+        "coordinates": {
+            "lat": "48.81444444444444",
+            "long": "2.391111111111111"
+        }
+    },
+    {
+        "stationName": "Vitry-sur-Seine",
+        "coordinates": {
+            "lat": "48.800555555555555",
+            "long": "2.402222222222222"
+        }
+    },
+    {
+        "stationName": "Les Ardoines",
+        "coordinates": {
+            "lat": "48.7825",
+            "long": "2.4094444444444445"
+        }
+    },
+    {
+        "stationName": "Petit Jouy - Les Loges",
+        "coordinates": {
+            "lat": "48.77027777777778",
+            "long": "2.1463888888888887"
+        }
+    },
+    {
+        "stationName": "Jouy-en-Josas",
+        "coordinates": {
+            "lat": "48.764722222222225",
+            "long": "2.163611111111111"
+        }
+    },
+    {
+        "stationName": "Vauboyen",
+        "coordinates": {
+            "lat": "48.759166666666665",
+            "long": "2.1919444444444443"
+        }
+    },
+    {
+        "stationName": "Bièvres",
+        "coordinates": {
+            "lat": "48.75138888888889",
+            "long": "2.215555555555556"
+        }
+    },
+    {
+        "stationName": "Igny",
+        "coordinates": {
+            "lat": "48.74",
+            "long": "2.2311111111111113"
+        }
+    },
+    {
+        "stationName": "Chemin d'Antony",
+        "coordinates": {
+            "lat": "48.74805555555556",
+            "long": "2.312777777777778"
+        }
+    },
+    {
+        "stationName": "Rungis - La Fraternelle",
+        "coordinates": {
+            "lat": "48.74055555555556",
+            "long": "2.352777777777778"
+        }
+    },
+    {
+        "stationName": "Pont de Rungis - Aéroport d'Orly",
+        "coordinates": {
+            "lat": "48.748333333333335",
+            "long": "2.372777777777778"
+        }
+    },
+    {
+        "stationName": "Orly-Ville",
+        "coordinates": {
+            "lat": "48.74194444444444",
+            "long": "2.4030555555555555"
+        }
+    },
+    {
+        "stationName": "Les Saules",
+        "coordinates": {
+            "lat": "48.745555555555555",
+            "long": "2.4175"
+        }
+    },
+    {
+        "stationName": "Choisy-le-Roi",
+        "coordinates": {
+            "lat": "48.76416666666667",
+            "long": "2.411111111111111"
+        }
+    },
+    {
+        "stationName": "Villeneuve-le-Roi",
+        "coordinates": {
+            "lat": "48.74",
+            "long": "2.426388888888889"
+        }
+    },
+    {
+        "stationName": "Ablon",
+        "coordinates": {
+            "lat": "48.72527777777778",
+            "long": "2.4194444444444443"
+        }
+    },
+    {
+        "stationName": "Athis-Mons",
+        "coordinates": {
+            "lat": "48.712500000000006",
+            "long": "2.4033333333333333"
+        }
+    },
+    {
+        "stationName": "Juvisy",
+        "coordinates": {
+            "lat": "48.689166666666665",
+            "long": "2.3827777777777777"
+        }
+    },
+    {
+        "stationName": "Longjumeau",
+        "coordinates": {
+            "lat": "48.702222222222225",
+            "long": "2.2944444444444443"
+        }
+    },
+    {
+        "stationName": "Chilly-Mazarin",
+        "coordinates": {
+            "lat": "48.70055555555556",
+            "long": "2.307222222222222"
+        }
+    },
+    {
+        "stationName": "Gravigny-Balizy",
+        "coordinates": {
+            "lat": "48.684999999999995",
+            "long": "2.3177777777777777"
+        }
+    },
+    {
+        "stationName": "Petit Vaux",
+        "coordinates": {
+            "lat": "48.67611111111111",
+            "long": "2.3333333333333335"
+        }
+    },
+    {
+        "stationName": "Savigny-sur-Orge",
+        "coordinates": {
+            "lat": "48.67611111111111",
+            "long": "2.3519444444444444"
+        }
+    },
+    {
+        "stationName": "Épinay-sur-Orge",
+        "coordinates": {
+            "lat": "48.669444444444444",
+            "long": "2.3319444444444444"
+        }
+    },
+    {
+        "stationName": "Sainte-Geneviève-des-Bois",
+        "coordinates": {
+            "lat": "48.653055555555554",
+            "long": "2.312777777777778"
+        }
+    },
+    {
+        "stationName": "Saint-Michel-sur-Orge",
+        "coordinates": {
+            "lat": "48.635555555555555",
+            "long": "2.3066666666666666"
+        }
+    },
+    {
+        "stationName": "Brétigny",
+        "coordinates": {
+            "lat": "48.60666666666667",
+            "long": "2.3024999999999998"
+        }
+    },
+    {
+        "stationName": "La Norville - Saint-Germain-lès-Arpajon",
+        "coordinates": {
+            "lat": "48.59166666666667",
+            "long": "2.2675"
+        }
+    },
+    {
+        "stationName": "Arpajon",
+        "coordinates": {
+            "lat": "48.586111111111116",
+            "long": "2.2408333333333332"
+        }
+    },
+    {
+        "stationName": "Égly",
+        "coordinates": {
+            "lat": "48.58222222222223",
+            "long": "2.2222222222222223"
+        }
+    },
+    {
+        "stationName": "Breuillet - Bruyères-le-Châtel",
+        "coordinates": {
+            "lat": "48.577222222222225",
+            "long": "2.1916666666666664"
+        }
+    },
+    {
+        "stationName": "Breuillet-Village",
+        "coordinates": {
+            "lat": "48.565",
+            "long": "2.1713888888888886"
+        }
+    },
+    {
+        "stationName": "Saint-Chéron",
+        "coordinates": {
+            "lat": "48.551111111111105",
+            "long": "2.1255555555555556"
+        }
+    },
+    {
+        "stationName": "Sermaise",
+        "coordinates": {
+            "lat": "48.535555555555554",
+            "long": "2.068888888888889"
+        }
+    },
+    {
+        "stationName": "Dourdan",
+        "coordinates": {
+            "lat": "48.53333333333333",
+            "long": "2.0097222222222224"
+        }
+    },
+    {
+        "stationName": "Dourdan - La Forêt",
+        "coordinates": {
+            "lat": "48.53527777777778",
+            "long": "1.9947222222222223"
+        }
+    },
+    {
+        "stationName": "Marolles-en-Hurepoix",
+        "coordinates": {
+            "lat": "48.565",
+            "long": "2.290833333333333"
+        }
+    },
+    {
+        "stationName": "Bouray",
+        "coordinates": {
+            "lat": "48.533055555555556",
+            "long": "2.2905555555555552"
+        }
+    },
+    {
+        "stationName": "Lardy",
+        "coordinates": {
+            "lat": "48.52055555555555",
+            "long": "2.2558333333333334"
+        }
+    },
+    {
+        "stationName": "Chamarande",
+        "coordinates": {
+            "lat": "48.51416666666667",
+            "long": "2.2158333333333333"
+        }
+    },
+    {
+        "stationName": "Étréchy",
+        "coordinates": {
+            "lat": "48.493611111111115",
+            "long": "2.194444444444444"
+        }
+    },
+    {
+        "stationName": "Étampes",
+        "coordinates": {
+            "lat": "48.43694444444444",
+            "long": "2.1594444444444445"
+        }
+    },
+    {
+        "stationName": "Saint-Martin-d'Étampes",
+        "coordinates": {
+            "lat": "48.427499999999995",
+            "long": "2.145277777777778"
+        }
+    },
+    {
+        "stationName": "Creil",
+        "coordinates": {
+            "lat": "49.26416666666667",
+            "long": "2.4691666666666667"
+        }
+    },
+    {
+        "stationName": "Chantilly - Gouvieux",
+        "coordinates": {
+            "lat": "49.18722222222222",
+            "long": "2.4594444444444448"
+        }
+    },
+    {
+        "stationName": "Orry-la-Ville - Coye",
+        "coordinates": {
+            "lat": "49.13861111111111",
+            "long": "2.49"
+        }
+    },
+    {
+        "stationName": "La Borne Blanche",
+        "coordinates": {
+            "lat": "49.12722222222222",
+            "long": "2.5055555555555555"
+        }
+    },
+    {
+        "stationName": "Survilliers - Fosses",
+        "coordinates": {
+            "lat": "49.099444444444444",
+            "long": "2.5258333333333334"
+        }
+    },
+    {
+        "stationName": "Louvres",
+        "coordinates": {
+            "lat": "49.049166666666665",
+            "long": "2.5019444444444443"
+        }
+    },
+    {
+        "stationName": "Les Noues",
+        "coordinates": {
+            "lat": "49.032222222222224",
+            "long": "2.4766666666666666"
+        }
+    },
+    {
+        "stationName": "Goussainville",
+        "coordinates": {
+            "lat": "49.02333333333333",
+            "long": "2.4625000000000004"
+        }
+    },
+    {
+        "stationName": "Villiers-le-Bel - Gonesse - Arnouville",
+        "coordinates": {
+            "lat": "48.99388888888889",
+            "long": "2.4166666666666665"
+        }
+    },
+    {
+        "stationName": "Garges - Sarcelles",
+        "coordinates": {
+            "lat": "48.97638888888889",
+            "long": "2.3905555555555553"
+        }
+    },
+    {
+        "stationName": "Pierrefitte - Stains",
+        "coordinates": {
+            "lat": "48.96388888888889",
+            "long": "2.3722222222222222"
+        }
+    },
+    {
+        "stationName": "Saint-Denis\nL'Île-Saint-Denis",
+        "coordinates": {
+            "lat": "48.93527777777778",
+            "long": "2.345555555555556"
+        }
+    },
+    {
+        "stationName": "Stade de France - Saint-Denis",
+        "coordinates": {
+            "lat": "48.91777777777777",
+            "long": "2.3505555555555557"
+        }
+    },
+    {
+        "stationName": "Maisons-Alfort - Alfortville",
+        "coordinates": {
+            "lat": "48.802499999999995",
+            "long": "2.426111111111111"
+        }
+    },
+    {
+        "stationName": "Le Vert de Maisons",
+        "coordinates": {
+            "lat": "48.788333333333334",
+            "long": "2.4322222222222223"
+        }
+    },
+    {
+        "stationName": "Créteil-Pompadour\nParc Interdépartemental des Sports",
+        "coordinates": {
+            "lat": "48.771388888888886",
+            "long": "2.435277777777778"
+        }
+    },
+    {
+        "stationName": "Villeneuve-Triage",
+        "coordinates": {
+            "lat": "48.745",
+            "long": "2.4383333333333335"
+        }
+    },
+    {
+        "stationName": "Villeneuve-Saint-Georges",
+        "coordinates": {
+            "lat": "48.72972222222222",
+            "long": "2.4461111111111116"
+        }
+    },
+    {
+        "stationName": "Montgeron - Crosne",
+        "coordinates": {
+            "lat": "48.70805555555556",
+            "long": "2.4622222222222225"
+        }
+    },
+    {
+        "stationName": "Yerres",
+        "coordinates": {
+            "lat": "48.70666666666667",
+            "long": "2.4833333333333334"
+        }
+    },
+    {
+        "stationName": "Brunoy",
+        "coordinates": {
+            "lat": "48.69916666666666",
+            "long": "2.506111111111111"
+        }
+    },
+    {
+        "stationName": "Boussy-Saint-Antoine",
+        "coordinates": {
+            "lat": "48.68083333333333",
+            "long": "2.5327777777777776"
+        }
+    },
+    {
+        "stationName": "Combs-la-Ville - Quincy",
+        "coordinates": {
+            "lat": "48.66722222222222",
+            "long": "2.5480555555555555"
+        }
+    },
+    {
+        "stationName": "Lieusaint - Moissy",
+        "coordinates": {
+            "lat": "48.62833333333333",
+            "long": "2.569444444444444"
+        }
+    },
+    {
+        "stationName": "Savigny-le-Temple - Nandy",
+        "coordinates": {
+            "lat": "48.595555555555556",
+            "long": "2.583888888888889"
+        }
+    },
+    {
+        "stationName": "Cesson",
+        "coordinates": {
+            "lat": "48.56583333333333",
+            "long": "2.5941666666666667"
+        }
+    },
+    {
+        "stationName": "Le Mée",
+        "coordinates": {
+            "lat": "48.54",
+            "long": "2.6238888888888887"
+        }
+    },
+    {
+        "stationName": "Vigneux-sur-Seine",
+        "coordinates": {
+            "lat": "48.708333333333336",
+            "long": "2.4144444444444444"
+        }
+    },
+    {
+        "stationName": "Viry-Châtillon",
+        "coordinates": {
+            "lat": "48.67611111111111",
+            "long": "2.386388888888889"
+        }
+    },
+    {
+        "stationName": "Ris-Orangis",
+        "coordinates": {
+            "lat": "48.659166666666664",
+            "long": "2.4144444444444444"
+        }
+    },
+    {
+        "stationName": "Grand Bourg",
+        "coordinates": {
+            "lat": "48.64805555555556",
+            "long": "2.4358333333333335"
+        }
+    },
+    {
+        "stationName": "Évry-Val-de-Seine",
+        "coordinates": {
+            "lat": "48.63444444444444",
+            "long": "2.4522222222222223"
+        }
+    },
+    {
+        "stationName": "Grigny-Centre",
+        "coordinates": {
+            "lat": "48.65333333333333",
+            "long": "2.3958333333333335"
+        }
+    },
+    {
+        "stationName": "Orangis - Bois de l'Épine",
+        "coordinates": {
+            "lat": "48.63638888888889",
+            "long": "2.4077777777777776"
+        }
+    },
+    {
+        "stationName": "Évry-Courcouronnes",
+        "coordinates": {
+            "lat": "48.62583333333333",
+            "long": "2.4283333333333332"
+        }
+    },
+    {
+        "stationName": "Le Bras de Fer\nÉvry - Génopole",
+        "coordinates": {
+            "lat": "48.623333333333335",
+            "long": "2.4508333333333336"
+        }
+    },
+    {
+        "stationName": "Corbeil-Essonnes",
+        "coordinates": {
+            "lat": "48.61416666666667",
+            "long": "2.4736111111111114"
+        }
+    },
+    {
+        "stationName": "Essonnes - Robinson",
+        "coordinates": {
+            "lat": "48.60611111111111",
+            "long": "2.463611111111111"
+        }
+    },
+    {
+        "stationName": "Villabé",
+        "coordinates": {
+            "lat": "48.59277777777778",
+            "long": "2.461666666666667"
+        }
+    },
+    {
+        "stationName": "Le Plessis-Chenet",
+        "coordinates": {
+            "lat": "48.57333333333334",
+            "long": "2.479722222222222"
+        }
+    },
+    {
+        "stationName": "Le Coudray-Montceaux",
+        "coordinates": {
+            "lat": "48.56638888888889",
+            "long": "2.4925"
+        }
+    },
+    {
+        "stationName": "Saint-Fargeau",
+        "coordinates": {
+            "lat": "48.56444444444444",
+            "long": "2.5425"
+        }
+    },
+    {
+        "stationName": "Ponthierry - Pringy",
+        "coordinates": {
+            "lat": "48.535",
+            "long": "2.544722222222222"
+        }
+    },
+    {
+        "stationName": "Boissise-le-Roi",
+        "coordinates": {
+            "lat": "48.52916666666667",
+            "long": "2.5730555555555554"
+        }
+    },
+    {
+        "stationName": "Vosves",
+        "coordinates": {
+            "lat": "48.515",
+            "long": "2.5991666666666666"
+        }
+    },
+    {
+        "stationName": "Melun",
+        "coordinates": {
+            "lat": "48.52722222222222",
+            "long": "2.654722222222222"
+        }
+    },
+    {
+        "stationName": "Moulin-Galant",
+        "coordinates": {
+            "lat": "48.586111111111116",
+            "long": "2.4733333333333336"
+        }
+    },
+    {
+        "stationName": "Mennecy",
+        "coordinates": {
+            "lat": "48.571111111111115",
+            "long": "2.4441666666666664"
+        }
+    },
+    {
+        "stationName": "Ballancourt",
+        "coordinates": {
+            "lat": "48.532222222222224",
+            "long": "2.371111111111111"
+        }
+    },
+    {
+        "stationName": "La Ferté-Alais",
+        "coordinates": {
+            "lat": "48.484722222222224",
+            "long": "2.3516666666666666"
+        }
+    },
+    {
+        "stationName": "Boutigny",
+        "coordinates": {
+            "lat": "48.43472222222222",
+            "long": "2.3761111111111113"
+        }
+    },
+    {
+        "stationName": "Maisse",
+        "coordinates": {
+            "lat": "48.393055555555556",
+            "long": "2.3930555555555557"
+        }
+    },
+    {
+        "stationName": "Buno - Gironville",
+        "coordinates": {
+            "lat": "48.37027777777778",
+            "long": "2.3866666666666667"
+        }
+    },
+    {
+        "stationName": "Boigneville",
+        "coordinates": {
+            "lat": "48.342222222222226",
+            "long": "2.378888888888889"
+        }
+    },
+    {
+        "stationName": "Malesherbes",
+        "coordinates": {
+            "lat": "48.29333333333333",
+            "long": "2.401111111111111"
+        }
+    },
+    {
+        "stationName": "Haussmann - Saint-Lazare",
+        "coordinates": {
+            "lat": "48.875",
+            "long": "2.328888888888889"
+        }
+    },
+    {
+        "stationName": "Magenta",
+        "coordinates": {
+            "lat": "48.88",
+            "long": "2.3583333333333334"
+        }
+    },
+    {
+        "stationName": "Rosa-Parks",
+        "coordinates": {
+            "lat": "48.896388888888886",
+            "long": "2.3741666666666665"
+        }
+    },
+    {
+        "stationName": "Pantin",
+        "coordinates": {
+            "lat": "48.897777777777776",
+            "long": "2.4005555555555556"
+        }
+    },
+    {
+        "stationName": "Noisy-le-Sec",
+        "coordinates": {
+            "lat": "48.896388888888886",
+            "long": "2.4597222222222226"
+        }
+    },
+    {
+        "stationName": "Bondy",
+        "coordinates": {
+            "lat": "48.89416666666666",
+            "long": "2.479166666666667"
+        }
+    },
+    {
+        "stationName": "Le Raincy - Villemomble - Montfermeil",
+        "coordinates": {
+            "lat": "48.88916666666667",
+            "long": "2.5125"
+        }
+    },
+    {
+        "stationName": "Gagny",
+        "coordinates": {
+            "lat": "48.88333333333333",
+            "long": "2.5266666666666664"
+        }
+    },
+    {
+        "stationName": "Le Chénay-Gagny",
+        "coordinates": {
+            "lat": "48.87722222222222",
+            "long": "2.5527777777777776"
+        }
+    },
+    {
+        "stationName": "Chelles - Gournay",
+        "coordinates": {
+            "lat": "48.87416666666667",
+            "long": "2.5833333333333335"
+        }
+    },
+    {
+        "stationName": "Rosny-Bois-Perrier",
+        "coordinates": {
+            "lat": "48.88305555555556",
+            "long": "2.4808333333333334"
+        }
+    },
+    {
+        "stationName": "Rosny-sous-Bois",
+        "coordinates": {
+            "lat": "48.87083333333334",
+            "long": "2.4858333333333333"
+        }
+    },
+    {
+        "stationName": "Nogent - Le Perreux",
+        "coordinates": {
+            "lat": "48.83861111111111",
+            "long": "2.4941666666666666"
+        }
+    },
+    {
+        "stationName": "Les Boullereaux-Champigny",
+        "coordinates": {
+            "lat": "48.825",
+            "long": "2.511111111111111"
+        }
+    },
+    {
+        "stationName": "Villiers-sur-Marne -\nLe Plessis-Trévise",
+        "coordinates": {
+            "lat": "48.82333333333334",
+            "long": "2.5425"
+        }
+    },
+    {
+        "stationName": "Les Yvris-Noisy-le-Grand",
+        "coordinates": {
+            "lat": "48.823055555555555",
+            "long": "2.579722222222222"
+        }
+    },
+    {
+        "stationName": "Émerainville - Pontault-Combault",
+        "coordinates": {
+            "lat": "48.80611111111111",
+            "long": "2.618055555555556"
+        }
+    },
+    {
+        "stationName": "Roissy-en-Brie",
+        "coordinates": {
+            "lat": "48.79555555555555",
+            "long": "2.6502777777777777"
+        }
+    },
+    {
+        "stationName": "Ozoir-la-Ferrière",
+        "coordinates": {
+            "lat": "48.770833333333336",
+            "long": "2.690277777777778"
+        }
+    },
+    {
+        "stationName": "Gretz-Armainvilliers",
+        "coordinates": {
+            "lat": "48.745555555555555",
+            "long": "2.7280555555555557"
+        }
+    },
+    {
+        "stationName": "Tournan",
+        "coordinates": {
+            "lat": "48.739444444444445",
+            "long": "2.7591666666666668"
+        }
+    }
+]
