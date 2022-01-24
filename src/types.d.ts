@@ -10,16 +10,26 @@ export interface Position {
     y: number;
 }
 
-export interface Map {
-    width: number;
-    height: number;
+export interface GeoPosition {
+    long: string;
+    lat: string;
+    x?: number;
+    y?: number;
+}
+
+export interface GameMap {
+    startLong: string;
+    startLat: string;
+    endLong: string;
+    endLat: string;
+    size?: number,
 }
 
 // Graph Vertices
 export interface Station {
     id: string;
     name: string;
-    position: Position;
+    position: GeoPosition;
     linesIndex: number[];
     linkedTo: number[];
     size: number;
@@ -45,7 +55,8 @@ export interface Line {
 }
 
 export interface Train {
-    stats: {
+    info: {
+        name: string;
         maxSpeed: number;
         capacity: number;
     };
@@ -54,6 +65,8 @@ export interface Train {
         stoppingTimeSeconds: number;
     }
     location: {
+        position: Position;
+        running: boolean;
         stopped: boolean;
         stationIndex: number;
         currentLink: Link;

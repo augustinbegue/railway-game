@@ -6,10 +6,13 @@
     import Two from "two.js";
     import IconBarMenus from "./components/IconBarMenus.svelte";
     import TimeDisplayComponent from "./components/TimeDisplayComponent.svelte";
+    import type { element } from "svelte/internal";
 
     let map: Map = {
-        width: 10000,
-        height: 10000,
+        startLat: "49.06184534469902",
+        startLong: "1.9905683951191235",
+        endLat: "48.73086675443339",
+        endLong: "2.800477633990632",
     };
 
     let stations: Station[] = [
@@ -17,8 +20,8 @@
             id: "0",
             name: "Gare de Lyon",
             position: {
-                x: 750,
-                y: 450,
+                lat: "48.844331423536104",
+                long: "2.3743789755592752",
             },
             linesIndex: [0],
             linkedTo: [1, 4, 7],
@@ -28,8 +31,8 @@
             id: "1",
             name: "Chatelet",
             position: {
-                x: 550,
-                y: 400,
+                lat: "48.86214501019702",
+                long: "2.3469808486242782",
             },
             linesIndex: [0],
             linkedTo: [0, 3, 5, 6],
@@ -39,8 +42,8 @@
             id: "2",
             name: "Etoile",
             position: {
-                x: 100,
-                y: 350,
+                lat: "48.8740320341854",
+                long: "2.2954183548242755",
             },
             linesIndex: [0],
             linkedTo: [3],
@@ -50,8 +53,8 @@
             id: "3",
             name: "Auber",
             position: {
-                x: 350,
-                y: 350,
+                lat: "48.872953508800514",
+                long: "2.3297494951888225",
             },
             linesIndex: [0],
             linkedTo: [1, 2],
@@ -61,8 +64,8 @@
             id: "4",
             name: "Nation",
             position: {
-                x: 820,
-                y: 410,
+                lat: "48.84887653031363",
+                long: "2.397037739771677",
             },
             linesIndex: [0],
             linkedTo: [0, 8],
@@ -72,8 +75,8 @@
             id: "5",
             name: "Gare du Nord",
             position: {
-                x: 500,
-                y: 220,
+                lat: "48.881041137398256",
+                long: "2.3553216153040224",
             },
             linesIndex: [1],
             linkedTo: [1],
@@ -83,8 +86,8 @@
             id: "6",
             name: "Saint-Michel",
             position: {
-                x: 570,
-                y: 450,
+                lat: "48.8537757118776",
+                long: "2.3449661735682734",
             },
             linesIndex: [1],
             linkedTo: [1],
@@ -94,8 +97,8 @@
             id: "7",
             name: "Maisons-Alfort",
             position: {
-                x: 1000,
-                y: 650,
+                lat: "48.80226232608523",
+                long: "2.426887820649135",
             },
             linesIndex: [1],
             linkedTo: [0],
@@ -105,8 +108,8 @@
             id: "8",
             name: "Vincennes",
             position: {
-                x: 1100,
-                y: 400,
+                lat: "48.84731139381693",
+                long: "2.4332493504876904",
             },
             linesIndex: [1],
             linkedTo: [4],
@@ -121,7 +124,29 @@
             stations: [8, 4, 0, 1, 3, 2],
             color: "#da291c",
             hidden: false,
-            trains: [],
+            trains: [
+                {
+                    info: {
+                        name: "Mi09 #1",
+                        maxSpeed: 140,
+                        capacity: 1300,
+                    },
+                    schedule: {
+                        startTimeSeconds: 0,
+                        stoppingTimeSeconds: 0,
+                    },
+                    location: {
+                        running: false,
+                        stopped: false,
+                        stationIndex: 0,
+                        currentLink: null,
+                        percent: 0,
+                        trackIsForward: true,
+                        reverseTrip: false,
+                    },
+                    element: null,
+                },
+            ],
         },
         {
             id: "2",
@@ -137,7 +162,29 @@
             stations: [7, 0, 1, 5],
             color: "#007a53",
             hidden: true,
-            trains: [],
+            trains: [
+                {
+                    info: {
+                        name: "Regio 2N #1",
+                        maxSpeed: 140,
+                        capacity: 1300,
+                    },
+                    schedule: {
+                        startTimeSeconds: 0,
+                        stoppingTimeSeconds: 0,
+                    },
+                    location: {
+                        running: false,
+                        stopped: false,
+                        stationIndex: 0,
+                        currentLink: null,
+                        percent: 0,
+                        trackIsForward: true,
+                        reverseTrip: false,
+                    },
+                    element: null,
+                },
+            ],
         },
     ];
 
@@ -150,15 +197,33 @@
     let stationContextMenuOpen: boolean = false;
 
     onMount(() => {
-        renderer = new GameRenderer(stations, lines);
+        renderer = new GameRenderer(map, stations, lines);
 
         document.body.onwheel = (e) => {
-            renderer.two.scene.scale -= e.deltaY / 500;
-            if (renderer.two.scene.scale < 0.1) {
-                renderer.two.scene.scale = 0.1;
+            const amount = e.deltaY / 100;
+            let ratio =
+                1 -
+                (renderer.two.scene.scale - amount) / renderer.two.scene.scale;
+
+            console.log(amount, ratio);
+
+            if (renderer.two.scene.scale - amount >= 0.5) {
+                renderer.two.scene.scale -= amount;
+
+                renderer.two.scene.translation.x +=
+                    (e.clientX - renderer.two.scene.translation.x) * ratio;
+                renderer.two.scene.translation.y +=
+                    (e.clientY - renderer.two.scene.translation.y) * ratio;
+            } else {
+                ratio = 1 - 0.5 / renderer.two.scene.scale;
+
+                renderer.two.scene.scale = 0.5;
+
+                renderer.two.scene.translation.x +=
+                    (e.clientX - renderer.two.scene.translation.x) * ratio;
+                renderer.two.scene.translation.y +=
+                    (e.clientY - renderer.two.scene.translation.y) * ratio;
             }
-            renderer.two.scene.translation.x += e.deltaY;
-            renderer.two.scene.translation.y += e.deltaY;
         };
 
         // Mouse Events
@@ -167,7 +232,7 @@
         };
 
         let dragging = false;
-        let dragStart: Position = { x: 0, y: 0 };
+        let dragStart = { x: 0, y: 0 };
         document.body.onmousedown = (e) => {
             dragging = true;
             dragStart = { x: e.clientX, y: e.clientY };
