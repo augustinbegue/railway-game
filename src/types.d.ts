@@ -27,10 +27,10 @@ export interface GameMap {
 
 // Graph Vertices
 export interface Station {
-    id: string;
+    id: number;
     name: string;
     position: GeoPosition;
-    linesIndex: number[];
+    lineIds: number[];
     linkedTo: number[];
     size: number;
     circle?: any;
@@ -46,10 +46,10 @@ export interface Link {
 }
 
 export interface Line {
-    id: string;
+    id: number;
     name: string;
     color: string;
-    stations: number[];
+    stationIds: number[];
     hidden: boolean;
     trains: Train[];
 }

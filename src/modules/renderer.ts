@@ -1,5 +1,6 @@
 import Two from "two.js";
-import type { GameMap, GameTime, Line, Link, GeoPosition, Station } from "../types";
+import type { GameMap, GameTime, Line, Link, GeoPosition, Station, Train } from "../types";
+import { Storage } from "./storage";
 
 
 export class GameRenderer {
@@ -15,6 +16,7 @@ export class GameRenderer {
     links: Link[][] = [];
     tracks: Two.Line[][][] = [];
     lines: Line[] = [];
+    trains: Train[] = [];
 
     constructor(map: GameMap, stations: Station[], lines: Line[]) {
         this.map = map;
@@ -39,14 +41,14 @@ export class GameRenderer {
         // 10 meters = 1 pixel;
         this.map.size = diagMeters / 10;
 
-        console.log(diagMeters, this.map.size)
-
         let scaleFactor = 1;
 
         let mapStartX = (mapStartLong * this.map.size) / scaleFactor;
         let mapStartY = 1 - (mapStartLat * this.map.size) / scaleFactor;
 
         // Init links and tracks array
+        this.links = [];
+        this.tracks = [];
         for (let i = 0; i < this.stations.length; i++) {
             const station = this.stations[i];
             this.links[i] = [];
@@ -60,8 +62,6 @@ export class GameRenderer {
 
             station.position.x = (long * this.map.size) / scaleFactor - mapStartX;
             station.position.y = 1 - (lat * this.map.size) / scaleFactor - mapStartY;
-
-            console.log(station.position.x, station.position.y);
 
             // Build the adjacency matrix of links between the stations
             for (let j = 0; j < station.linkedTo.length; j++) {
@@ -81,6 +81,71 @@ export class GameRenderer {
         // Center the camera on the first station
         this.two.scene.translation.x = (- this.stations[0].position.x / 2);
         this.two.scene.translation.y = (- this.stations[0].position.y / 2);
+
+        this.draw();
+    }
+
+    // Add a new line
+    addLine(name: string, color: string): Line {
+        let line: Line = {
+            id: this.lines.length,
+            name: name,
+            color: color,
+            stationIds: [],
+            hidden: false,
+            trains: [],
+        };
+
+        this.lines.push(line);
+
+        Storage.save(Storage.keys.LINES, this.lines);
+
+        return line;
+    }
+
+    // Add a station to a line
+    addStationToLine(lineId: number, stationId: number) {
+        let line = this.lines.find(line => line.id === lineId);
+        let station = this.stations.find(station => station.id === stationId);
+        let lastStationId = line.stationIds[line.stationIds.length - 1];
+        let lastStation = this.stations.find(station => station.id === lastStationId);
+
+
+        if (lastStation && !this.links[station.id].find(l => l.to === lastStation.id)) {
+            console.log("Creating links between stations", lastStationId, station.id);
+            // Create the links between the station and the line if it doesn't already exist
+            let link1: Link = {
+                from: station.id,
+                to: lastStationId,
+                tracks: 2,
+            };
+            this.links[station.id].push(link1);
+            let link2: Link = {
+                from: lastStationId,
+                to: station.id,
+                tracks: 2,
+            };
+            this.links[lastStationId].push(link2);
+
+            station.linkedTo.push(lastStationId);
+            lastStation.linkedTo.push(station.id);
+        }
+
+        // Add the station to the line
+        line.stationIds.push(station.id);
+        station.lineIds.push(line.id);
+
+        // Save modified data
+        Storage.save(Storage.keys.LINES, this.lines);
+        Storage.save(Storage.keys.LINKS, this.links.map(links => links.map(link => {
+            link.drawn = false;
+            return link;
+        })));
+        Storage.save(Storage.keys.STATIONS, this.stations.map(station => {
+            station.circle = null;
+            station.text = null;
+            return station;
+        }));
 
         this.draw();
     }
@@ -131,7 +196,7 @@ export class GameRenderer {
 
                 // Get first link
                 if (!train.location.currentLink) {
-                    train.location.currentLink = this.links[line.stations[0]].find(l => l.to === line.stations[1]);
+                    train.location.currentLink = this.links[line.stationIds[0]].find(l => l.to === line.stationIds[1]);
                     train.location.stationIndex = 1;
                 }
 
@@ -170,11 +235,11 @@ export class GameRenderer {
                 // Ended -> Get the next link
                 if (train.location.percent > 100) {
                     train.location.percent = 0;
-                    let currentStation = line.stations[train.location.stationIndex];
+                    let currentStation = line.stationIds[train.location.stationIndex];
                     train.location.stationIndex = train.location.reverseTrip ? train.location.stationIndex - 1 : train.location.stationIndex + 1;
 
                     // Turn back
-                    if (train.location.stationIndex >= line.stations.length) {
+                    if (train.location.stationIndex >= line.stationIds.length) {
                         train.location.reverseTrip = true;
                         train.location.stationIndex -= 2;
                     } else if (train.location.stationIndex < 0) {
@@ -182,7 +247,7 @@ export class GameRenderer {
                         train.location.stationIndex = 0;
                     }
 
-                    let newStation = line.stations[train.location.stationIndex];
+                    let newStation = line.stationIds[train.location.stationIndex];
 
                     console.log(`${train.info.name} Reached station ${this.stations[currentStation].name}`);
 
@@ -201,7 +266,7 @@ export class GameRenderer {
         }
     }
 
-    drawStation(station: Station, fill = "#8f9ebf") {
+    private drawStation(station: Station, fill = "#8f9ebf") {
         // TODO: Implement station colors
 
         if (station.circle) {
@@ -234,7 +299,7 @@ export class GameRenderer {
         station.text.family = "sans-serif";
     }
 
-    drawLink(from: number) {
+    private drawLink(from: number) {
         let linkAdjList = this.links[from];
 
         for (let i = 0; i < linkAdjList.length; i++) {
@@ -314,12 +379,12 @@ export class GameRenderer {
 
     private getLinesUsingLink(link: Link) {
         return this.lines.filter((l) => {
-            let f = l.stations.indexOf(link.from);
-            if (l.stations[f + 1] === link.to) {
+            let f = l.stationIds.indexOf(link.from);
+            if (l.stationIds[f + 1] === link.to) {
                 return true;
             } else {
-                f = l.stations.indexOf(link.to)
-                return l.stations[f + 1] === link.from;
+                f = l.stationIds.indexOf(link.to)
+                return l.stationIds[f + 1] === link.from;
             }
         });
     }

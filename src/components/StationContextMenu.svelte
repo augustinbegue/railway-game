@@ -1,8 +1,9 @@
 <script lang="ts">
     import { each } from "svelte/internal";
     import type { GameRenderer } from "../modules/renderer";
+    import { Storage } from "../modules/storage";
 
-    import type { Link, Station } from "../types";
+    import type { Line, Station } from "../types";
 
     export let renderer: GameRenderer;
     export let station: Station;
@@ -10,7 +11,7 @@
 
     function increaseTrackNumber(from: number, to: number) {
         let input = document.querySelector(
-            `#link${from}tracks`
+            `#link${from}tracks`,
         ) as HTMLInputElement;
 
         let newvalue = parseInt(input.value) + 1;
@@ -26,7 +27,7 @@
 
     function decreaseTrackNumber(from: number, to: number) {
         let input = document.querySelector(
-            `#link${from}tracks`
+            `#link${from}tracks`,
         ) as HTMLInputElement;
 
         let newvalue = parseInt(input.value) - 1;
@@ -62,13 +63,60 @@
 
         renderer.draw();
     }
+
+    let addToLineToggle = false;
+    let addToLineSelect: HTMLSelectElement;
+    $: linesNotInStation = renderer.lines?.filter(
+        (l) => !l.stationIds.includes(station?.id),
+    );
+    function addToLineClicked(e: MouseEvent) {
+        addToLineToggle = !addToLineToggle;
+        if (addToLineToggle) {
+            linesNotInStation = renderer.lines.filter(
+                (l) => !l.stationIds.includes(station.id),
+            );
+        }
+    }
+    function addToLine() {
+        let id = addToLineSelect.value;
+        console.log("Adding station ", station.id, " to line ", id);
+        renderer.addStationToLine(parseInt(id), station.id);
+        linesNotInStation = renderer.lines.filter(
+            (l) => !l.stationIds.includes(station.id),
+        );
+    }
 </script>
 
+<!-- Add To Line Form -->
+{#if station && open && addToLineToggle && linesNotInStation.length > 0}
+    <div class="box w-fit">
+        <p>Add {station.name} to a line</p>
+        <select bind:this={addToLineSelect}>
+            {#each linesNotInStation as line}
+                <option value={line.id}>
+                    <span
+                        class="p-3 rounded-lg"
+                        style="background-color: {line.color};"
+                    />
+                    <p>
+                        {line.name}
+                    </p>
+                </option>
+            {/each}
+        </select>
+        <div>
+            <button class="button" on:click={addToLine}>Save</button>
+            <button class="button" on:click={addToLineClicked}>Cancel</button>
+        </div>
+    </div>
+{/if}
+
 {#if station && open}
-    <div class="m-4 p-4 rounded bg-dark-100 text-slate-200 flex flex-col">
+    <div class="m-4 p-4 rounded-lg bg-dark-100 text-slate-200 flex flex-col">
         <span class="title text-white">{station.name}</span>
-        <div class="subcontainer">
-            <div>
+        <!-- Links List -->
+        {#if station.linkedTo.length > 0}
+            <div class="subcontainer">
                 <span class="subtitle text-white">Links</span>
                 <div class="container-grid">
                     {#each station.linkedTo as i}
@@ -84,22 +132,19 @@
                                     class="bg-dark-100 p-1 w-8"
                                     type="text"
                                     value={renderer.links[i].find(
-                                        (l) => l.to === parseInt(station.id)
+                                        (l) => l.to === parseInt(station.id),
                                     ).tracks}
                                     on:change={(e) =>
                                         setTrackNumber(
                                             i,
-                                            parseInt(station.id),
-                                            e.target.value
+                                            station.id,
+                                            e.target.value,
                                         )}
                                 />
                                 <button
                                     class="p-1 bg-dark-200 rounded leading-none hover:bg-dark-400 transition-all"
                                     on:click={(ev) =>
-                                        increaseTrackNumber(
-                                            i,
-                                            parseInt(station.id)
-                                        )}
+                                        increaseTrackNumber(i, station.id)}
                                 >
                                     <i class="fas fa-plus" />
                                 </button>
@@ -107,10 +152,7 @@
                                 <button
                                     class="p-1 bg-dark-200 rounded leading-none hover:bg-dark-400 transition-all"
                                     on:click={(ev) =>
-                                        decreaseTrackNumber(
-                                            i,
-                                            parseInt(station.id)
-                                        )}
+                                        decreaseTrackNumber(i, station.id)}
                                 >
                                     <i class="fas fa-minus" />
                                 </button>
@@ -119,32 +161,39 @@
                     {/each}
                 </div>
             </div>
-        </div>
+        {/if}
+        <!-- Lines List -->
+        {#if station.lineIds.length > 0}
+            <div class="subcontainer">
+                <span class="subtitle text-white">Lines</span>
+                <div class="flex flex-row">
+                    {#each station.lineIds as i}
+                        <div class="inline-flex flex-row items-center pl-2">
+                            <span
+                                class="p-3 rounded-lg"
+                                style="background-color: {renderer.lines[i]
+                                    .color};"
+                            />
+                            <span class="subsubtitle pl-2">
+                                {renderer.lines[i].name}
+                            </span>
+                        </div>
+                    {/each}
+                </div>
+            </div>
+        {/if}
+        <!-- Add to Line -->
+        {#if linesNotInStation.length > 0}
+            <div class="subcontainer">
+                <div>
+                    <button class="button" on:click={addToLineClicked}>
+                        Add to line
+                    </button>
+                </div>
+            </div>
+        {/if}
     </div>
 {/if}
 
 <style lang="postcss">
-    .title {
-        @apply text-2xl font-semibold;
-    }
-
-    .subtitle {
-        @apply text-lg font-semibold;
-    }
-
-    .subsubtitle {
-        @apply text-base font-semibold;
-    }
-
-    .subcontainer {
-        @apply flex flex-row;
-    }
-
-    .subsubcontainer {
-        @apply flex flex-col;
-    }
-
-    .container-grid {
-        @apply grid grid-rows-2 gap-4 grid-flow-col;
-    }
 </style>
