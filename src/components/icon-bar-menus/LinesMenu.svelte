@@ -1,7 +1,9 @@
 <script lang="ts">
     import { onMount } from "svelte";
-
+    import { InteractiveElements } from "../../modules/interactive-elements";
     import type { GameRenderer } from "../../modules/renderer";
+    import type { Line, Train } from "../../types";
+
     export let renderer: GameRenderer;
     function toggleLine(el: HTMLElement, lineIndex: number) {
         let child = el.childNodes[0] as HTMLElement;
@@ -13,64 +15,66 @@
         renderer.draw();
     }
 
-    let editLineElement: HTMLElement;
-    let editLineNameInput: HTMLInputElement;
-    let editLineColorInput: HTMLInputElement;
-    let currentLine: number;
+    let lineFormElement: HTMLElement;
+    let currentLineId: number;
+    let currentLine: Line = {
+        id: -1,
+        name: "",
+        color: "",
+        hidden: false,
+        stationIds: [],
+        trains: [],
+    };
+    function addLine() {
+        lineFormElement.style.display = null;
+        currentLineId = -1;
+    }
     function editLine(el: HTMLElement, lineIndex: number) {
-        editLineElement.style.display = null;
-        currentLine = lineIndex;
-        let line = renderer.lines[currentLine];
-
-        editLineColorInput.value = line.color;
-        editLineNameInput.value = line.name;
-        line.stationIds;
-        line.trains;
+        lineFormElement.style.display = null;
+        currentLineId = lineIndex;
+        let line = renderer.lines[currentLineId];
+        currentLine = line;
     }
-    function cancelEditLine() {
-        editLineElement.style.display = "none";
+    function cancelLineForm() {
+        lineFormElement.style.display = "none";
+        currentLine = {
+            id: -1,
+            name: "",
+            color: "#ffffff",
+            hidden: false,
+            stationIds: [],
+            trains: [],
+        };
     }
-    function submitEditLine() {
-        let line = renderer.lines[currentLine];
-
-        line.color = editLineColorInput.value;
-        line.name = editLineNameInput.value;
-
-        editLineElement.style.display = "none";
-    }
-
-    let addLineElement: HTMLElement;
-    let addLineNameInput: HTMLInputElement;
-    let addLineColorInput: HTMLInputElement;
-    function showAddLineForm() {
-        addLineElement.style.display = null;
-    }
-    function submitAddLineForm() {
-        let name = addLineNameInput.value;
-        let color = addLineColorInput.value;
-
-        if (name.length > 0 && color.length > 0) {
-            renderer.addLine(name, color);
+    function submitLineForm() {
+        if (currentLine.name.length > 0) {
+            if (currentLineId != -1) {
+                renderer.editLine(currentLine);
+            } else {
+                renderer.addLine(currentLine);
+            }
             renderer.draw();
-            hideAddLineForm();
+            cancelLineForm();
         }
     }
-    function hideAddLineForm() {
-        addLineElement.style.display = "none";
-        addLineNameInput.value = "";
-        addLineColorInput.value = "";
+
+    let AddTrainDropdown: HTMLElement;
+    function addTrain(train: Train) {
+        renderer.addTrainToLine(currentLine.id, train.id);
+        renderer.draw();
     }
 
     onMount(() => {
-        addLineElement.style.display = "none";
-        editLineElement.style.display = "none";
+        cancelLineForm();
+        InteractiveElements.Tabs(lineFormElement);
+        InteractiveElements.Dropdown(AddTrainDropdown);
     });
 </script>
 
 <div class="flex flex-row">
-    <div class="box w-fit">
+    <div class="box w-fit h-fit">
         <div>
-            <button class="button" on:click={showAddLineForm}>
+            <button class="button" on:click={addLine}>
                 <i class="fas fa-plus" /> New line
             </button>
             <p class="desc-text">Lines: {renderer.lines.length}</p>
@@ -107,36 +111,86 @@
         {/each}
     </div>
 
-    <!-- Edit Line Form -->
-    <div class="box" bind:this={editLineElement}>
-        <div>
-            <p>Name:</p>
-            <input type="text" bind:this={editLineNameInput} />
+    <!-- Line Form -->
+    <div class="box-tabs" bind:this={lineFormElement}>
+        <span class="box-tabs-header">
+            <!-- svelte-ignore a11y-missing-attribute -->
+            <a class="active">Properties</a>
+            <!-- svelte-ignore a11y-missing-attribute -->
+            <a>Stations</a>
+            <!-- svelte-ignore a11y-missing-attribute -->
+            <a>Trains</a>
+        </span>
+        <div class="box-tabs-content active">
+            <span>
+                <p>Name:</p>
+                <input type="text" bind:value={currentLine.name} />
+            </span>
+            <span>
+                <p>Color:</p>
+                <input type="color" bind:value={currentLine.color} />
+            </span>
         </div>
-        <div>
-            <p>Color:</p>
-            <input type="color" bind:this={editLineColorInput} />
+        <div class="box-tabs-content">
+            <span>
+                <p>
+                    {#key currentLine.stationIds}
+                        Count: {currentLine.stationIds.length}
+                    {/key}
+                </p>
+            </span>
+            <ul class="stations-list" style="--line-color: {currentLine.color}">
+                {#each currentLine.stationIds as stationId}
+                    <li>
+                        <span />
+                        {renderer.stations[stationId].name}
+                    </li>
+                {/each}
+            </ul>
         </div>
-        <div>
-            <button class="button" on:click={submitEditLine}>Save</button>
-            <button class="button" on:click={cancelEditLine}>Cancel</button>
+        <div class="box-tabs-content">
+            <span>
+                <p>
+                    {#key currentLine.trains}
+                        <!-- TODO: Line capacity -->
+                        Count: {currentLine.trains.length}
+                    {/key}
+                </p>
+            </span>
+            <ul class="trains-list">
+                {#each currentLine.trains as train}
+                    <li>
+                        {train.info.name}
+                    </li>
+                {/each}
+            </ul>
+            <div class="button-dropdown" bind:this={AddTrainDropdown}>
+                <button>
+                    <i class="fas fa-plus" /> Add a train
+                </button>
+                <div>
+                    {#each renderer.trains as train}
+                        <span on:click={() => addTrain(train)}>
+                            <p>
+                                {train.info.name}
+                            </p>
+                            <p>
+                                {train.info.capacity} <i class="fas fa-users" />
+                            </p>
+                            <p>
+                                {train.info.maxSpeed}
+                                <i class="fas fa-tachometer-alt" />
+                            </p>
+                        </span>
+                    {/each}
+                </div>
+            </div>
         </div>
-    </div>
-
-    <!-- Add Line Form -->
-    <div class="box" bind:this={addLineElement}>
-        <div>
-            <p>Name:</p>
-            <input type="text" bind:this={addLineNameInput} />
-        </div>
-        <div>
-            <p>Color:</p>
-            <input type="color" bind:this={addLineColorInput} />
-        </div>
-        <div>
-            <button class="button" on:click={submitAddLineForm}>Add line</button
-            >
-            <button class="button" on:click={hideAddLineForm}>Cancel</button>
+        <div class="span">
+            <span>
+                <button class="button" on:click={submitLineForm}>Save</button>
+                <button class="button" on:click={cancelLineForm}>Cancel</button>
+            </span>
         </div>
     </div>
 </div>

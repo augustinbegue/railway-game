@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import StationContextMenu from "./components/StationContextMenu.svelte";
-    import { GameRenderer } from "./modules/renderer";
     import type { GameMap, Line, Station, Link, Position } from "./types";
     import Two from "two.js";
+    import { onMount } from "svelte";
+    import { GameRenderer } from "./modules/renderer";
+    import StationContextMenu from "./components/StationContextMenu.svelte";
     import IconBarMenus from "./components/icon-bar-menus/IconBarMenus.svelte";
     import TimeDisplayComponent from "./components/TimeDisplayComponent.svelte";
     import stationsJSON from "./data/scraping/stations-rer.json";
@@ -174,7 +174,8 @@
     @tailwind components;
     @tailwind utilities;
 
-    .box {
+    .box,
+    .box-tabs {
         @apply bg-dark-100 p-4 m-2 rounded-lg flex flex-col text-dark-500;
     }
 
@@ -182,12 +183,71 @@
         @apply inline-flex flex-row items-center;
     }
 
-    .box p {
+    .box p,
+    .box-tabs p {
         @apply text-sm font-semibold;
+    }
+
+    .box-tabs a {
+        @apply text-sm font-semibold cursor-pointer p-2;
+    }
+
+    .box-tabs a:hover {
+        @apply text-dark-400;
+    }
+
+    .box-tabs a.active {
+        @apply text-dark-500 underline;
+    }
+
+    .box-tabs-content {
+        @apply p-2;
+        display: none !important;
+    }
+
+    .box-tabs-content.active {
+        @apply text-dark-500;
+        display: inline-flex !important;
     }
 
     .box button {
         @apply bg-dark-50;
+    }
+
+    .box-tabs div {
+        @apply flex flex-col;
+    }
+
+    .box-tabs span {
+        @apply inline-flex flex-row items-center;
+    }
+
+    .box-tabs span.box-tabs-header {
+        @apply inline-flex flex-row items-center justify-start;
+    }
+
+    .box-tabs ul.stations-list,
+    .box-tabs ul.trains-list {
+        @apply text-base flex flex-col flex-nowrap items-start;
+    }
+
+    .box-tabs ul.stations-list li {
+        @apply ml-4 inline-flex items-center justify-center;
+    }
+
+    .box-tabs ul.stations-list li span::before {
+        @apply inline-block relative z-0 w-2 h-8 left-2;
+        background-color: var(--line-color);
+        content: "";
+    }
+
+    .box-tabs ul.stations-list li span::after {
+        @apply inline-block relative z-10 w-4 h-4 rounded-full bg-dark-300 right-1;
+        content: "";
+    }
+
+    .box-tabs ul.stations-list li:first-child {
+        @apply mt-4;
     }
 
     input,
@@ -229,5 +289,48 @@
 
     .desc-text {
         @apply py-2 px-4 m-2 text-sm text-dark-500;
+    }
+
+    .button-dropdown {
+        @apply m-2;
+    }
+
+    .button-dropdown button {
+        @apply button;
+        margin: 0 !important;
+    }
+
+    .button-dropdown div {
+        @apply hidden absolute flex-col bg-dark-100 rounded-lg mt-9;
+    }
+
+    .button-dropdown div.active {
+        @apply flex;
+    }
+
+    .button-dropdown span {
+        @apply cursor-pointer hover:bg-dark-200 p-2 inline-flex flex-row items-center justify-between border-b-2 border-dark-200;
+    }
+
+    .button-dropdown span p {
+        @apply text-sm font-semibold mr-2;
+    }
+
+    .button-dropdown span:first-child {
+        @apply rounded-t-lg;
+    }
+
+    .button-dropdown span:last-child {
+        @apply border-0 rounded-b-lg;
+    }
+
+    .box .button-dropdown div,
+    .box-tabs .button-dropdown div {
+        @apply bg-dark-200;
+    }
+
+    .box .button-dropdown span,
+    .box-tabs .button-dropdown span {
+        @apply hover:bg-dark-300 border-dark-300;
     }
 </style>

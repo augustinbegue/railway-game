@@ -55,6 +55,7 @@ export interface Line {
 }
 
 export interface Train {
+    id: number;
     info: {
         name: string;
         maxSpeed: number;

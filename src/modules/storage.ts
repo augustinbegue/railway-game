@@ -3,6 +3,7 @@ export class Storage {
         LINES: "lines",
         LINKS: "links",
         STATIONS: "stations",
+        TRAINS: "trains",
     }
 
     static save(key: string, value: object) {

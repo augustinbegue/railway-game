@@ -1,5 +1,5 @@
 import Two from "two.js";
-import type { GameMap, GameTime, Line, Link, GeoPosition, Station, Train } from "../types";
+import type { GameMap, GameTime, Line, Link, Station, Train } from "../types";
 import { Storage } from "./storage";
 
 
@@ -22,6 +22,7 @@ export class GameRenderer {
         this.map = map;
         this.stations = stations;
         this.lines = lines;
+        this.trains = Storage.get(Storage.keys.TRAINS) || [];
 
         this.two = new Two({
             fullscreen: true,
@@ -85,22 +86,50 @@ export class GameRenderer {
         this.draw();
     }
 
+    // Add a new train type
+    addTrainType(train: Train): Train {
+        train.id = this.trains.length;
+        this.trains.push(train);
+        Storage.save(Storage.keys.TRAINS, this.trains);
+
+        return train;
+    }
+
+    // Edit a train type
+    editTrainType(train: Train) {
+        let index = this.trains.findIndex(t => t.id === train.id);
+        this.trains[index] = train;
+        Storage.save(Storage.keys.TRAINS, this.trains);
+
+        return train;
+    }
+
     // Add a new line
-    addLine(name: string, color: string): Line {
-        let line: Line = {
-            id: this.lines.length,
-            name: name,
-            color: color,
-            stationIds: [],
-            hidden: false,
-            trains: [],
-        };
-
+    addLine(line: Line): Line {
+        line.id = this.lines.length;
+        console.log(line);
         this.lines.push(line);
-
         Storage.save(Storage.keys.LINES, this.lines);
 
         return line;
+    }
+
+    // Edit a line
+    editLine(line: Line) {
+        let index = this.lines.findIndex(l => l.id === line.id);
+        this.lines[index] = line;
+        Storage.save(Storage.keys.LINES, this.lines);
+
+        return line;
+    }
+
+    // Add a train to a line
+    addTrainToLine(lineId: number, trainId: number) {
+        let newTrain = Object.assign({}, this.trains[trainId]);
+        this.lines[lineId].trains.push(newTrain);
+        Storage.save(Storage.keys.LINES, this.lines);
+
+        return newTrain;
     }
 
     // Add a station to a line
@@ -181,6 +210,9 @@ export class GameRenderer {
         // Update Trains on each line
         for (let i = 0; i < this.lines.length; i++) {
             const line = this.lines[i];
+
+            if (line.stationIds.length < 2)
+                continue;
 
             for (let i = 0; i < line.trains.length; i++) {
                 const train = line.trains[i];
