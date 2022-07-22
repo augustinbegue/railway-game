@@ -80,8 +80,8 @@ export class GameRenderer {
         let rect = document.body.getBoundingClientRect();
 
         // Center the camera on the first station
-        this.two.scene.translation.x = (- this.stations[0].position.x / 2);
-        this.two.scene.translation.y = (- this.stations[0].position.y / 2);
+        this.two.scene.translation.x = -(this.stations[0].position.x);
+        this.two.scene.translation.y = -(this.stations[0].position.y);
 
         this.draw();
     }
@@ -132,7 +132,11 @@ export class GameRenderer {
         return newTrain;
     }
 
-    // Add a station to a line
+    /**
+     * Add a station to a line
+     * @param lineId id of the line
+     * @param stationId id of the station
+     */
     addStationToLine(lineId: number, stationId: number) {
         let line = this.lines.find(line => line.id === lineId);
         let station = this.stations.find(station => station.id === stationId);
@@ -179,6 +183,45 @@ export class GameRenderer {
         this.draw();
     }
 
+    /**
+     * Inserts a station between two stations on a line
+     * @param lineId id of the line
+     * @param stationId id of the station
+     * @param index index to insert the station at
+     */
+    insertStationToLine(lineId: number, stationId: number, index: number) {
+        throw new Error("Method not implemented.");
+    }
+
+
+    /**
+     * Removes a station from a line
+     * @warning this does not removes the link between the stations
+     * @param lineId id of the line
+     * @param stationId id of the station
+     * @returns 
+     */
+    removeStationFromLine(lineId: number, stationId: number) {
+        let line = this.lines.find(line => line.id === lineId);
+        let station = this.stations.find(station => station.id === stationId);
+
+        // Remove the station from the line
+        let index = line.stationIds.indexOf(station.id);
+        line.stationIds.splice(index, 1);
+        index = station.lineIds.indexOf(line.id);
+        station.lineIds.splice(index, 1);
+
+        // Save modified data
+        Storage.save(Storage.keys.LINES, this.lines);
+        Storage.save(Storage.keys.STATIONS, this.stations.map(station => {
+            station.circle = null;
+            station.text = null;
+            return station;
+        }));
+
+        this.draw();
+    }
+
     draw() {
         // Reset scene drawing states
         this.two.clear();
@@ -195,7 +238,10 @@ export class GameRenderer {
             }
         }
 
-        console.log(this.tracks)
+        // TODO: Draw the lines on top of the links
+        // this.drawTracks(link, 8, linesUsingLink.filter(l => !l.hidden).map(l => l.color), 1)
+        // link.drawn = true;
+        // TODO: function findPathToStation
 
         // Draw each station
         for (let i = 0; i < this.stations.length; i++) {
@@ -342,16 +388,12 @@ export class GameRenderer {
             if (!link.drawn) {
                 this.tracks[link.from][link.to] = [];
                 this.tracks[link.to][link.from] = [];
-                if (linesUsingLink.length > 0 && !linesUsingLink.every(l => l.hidden)) {
-                    this.drawTracks(link, 8, linesUsingLink.filter(l => !l.hidden).map(l => l.color), 1)
-                    link.drawn = true;
-                } else {
-                    let lines = this.drawTracks(link, 1);
-                    link.drawn = true;
-                    let oppositelink = this.links[link.to].find((l) => l.to === link.from);
-                    oppositelink.drawn = true;
-                    this.tracks[link.from][link.to] = lines;
-                }
+
+                let lines = this.drawTracks(link, 1);
+                link.drawn = true;
+                let oppositelink = this.links[link.to].find((l) => l.to === link.from);
+                oppositelink.drawn = true;
+                this.tracks[link.from][link.to] = lines;
             }
         }
     }

@@ -232,16 +232,16 @@
     }
 
     .box-tabs ul.stations-list li {
-        @apply ml-4 inline-flex items-center justify-center;
+        @apply inline-flex items-center justify-center;
     }
 
-    .box-tabs ul.stations-list li span::before {
+    .box-tabs ul.stations-list li span:first-child:before {
         @apply inline-block relative z-0 w-2 h-8 left-2;
         background-color: var(--line-color);
         content: "";
     }
 
-    .box-tabs ul.stations-list li span::after {
+    .box-tabs ul.stations-list li span:first-child::after {
         @apply inline-block relative z-10 w-4 h-4 rounded-full bg-dark-300 right-1;
         content: "";
     }

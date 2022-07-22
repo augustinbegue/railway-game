@@ -64,6 +64,11 @@
         renderer.draw();
     }
 
+    function removeStation(stationId: number) {
+        renderer.removeStationFromLine(currentLine.id, stationId);
+        renderer.draw();
+    }
+
     onMount(() => {
         cancelLineForm();
         InteractiveElements.Tabs(lineFormElement);
@@ -141,9 +146,20 @@
             </span>
             <ul class="stations-list" style="--line-color: {currentLine.color}">
                 {#each currentLine.stationIds as stationId}
-                    <li>
+                    <li class="inline-flex w-full row justify-between">
                         <span />
-                        {renderer.stations[stationId].name}
+                        <p class="w-full mr-2">
+                            {renderer.stations[stationId].name}
+                        </p>
+                        <span>
+                            <i
+                                class="fas fa-times"
+                                on:click={() => {
+                                    removeStation(stationId);
+                                }}
+                            />
+                            <i class="ml-2 fas fa-grip-lines" />
+                        </span>
                     </li>
                 {/each}
             </ul>
