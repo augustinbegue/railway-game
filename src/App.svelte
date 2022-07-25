@@ -333,4 +333,9 @@
     .box-tabs .button-dropdown span {
         @apply hover:bg-dark-300 border-dark-300;
     }
+
+    .dragging {
+        @apply outline outline-2 rounded opacity-50;
+        outline-color: var(--line-color);
+    }
 </style>

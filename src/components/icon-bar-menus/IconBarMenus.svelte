@@ -16,8 +16,6 @@
     let trainsButton: HTMLElement;
     let trainsMenu: HTMLElement;
     function setActiveIcon(pressed: tab) {
-        console.log(currentTab, pressed);
-
         linesButton.classList.remove("active");
         linesMenu.style.display = "none";
         trainsButton.classList.remove("active");

@@ -143,30 +143,13 @@ export class GameRenderer {
         let lastStationId = line.stationIds[line.stationIds.length - 1];
         let lastStation = this.stations.find(station => station.id === lastStationId);
 
-
         if (lastStation && !this.links[station.id].find(l => l.to === lastStation.id)) {
-            console.log("Creating links between stations", lastStationId, station.id);
-            // Create the links between the station and the line if it doesn't already exist
-            let link1: Link = {
-                from: station.id,
-                to: lastStationId,
-                tracks: 2,
-            };
-            this.links[station.id].push(link1);
-            let link2: Link = {
-                from: lastStationId,
-                to: station.id,
-                tracks: 2,
-            };
-            this.links[lastStationId].push(link2);
-
-            station.linkedTo.push(lastStationId);
-            lastStation.linkedTo.push(station.id);
+            this.createLink(lastStation, station);
         }
 
         // Add the station to the line
-        line.stationIds.push(station.id);
-        station.lineIds.push(line.id);
+        line.stationIds = [...line.stationIds, stationId];
+        station.lineIds = [...station.lineIds, lineId];
 
         // Save modified data
         Storage.save(Storage.keys.LINES, this.lines);
@@ -190,7 +173,35 @@ export class GameRenderer {
      * @param index index to insert the station at
      */
     insertStationToLine(lineId: number, stationId: number, index: number) {
-        throw new Error("Method not implemented.");
+        const line = this.lines.find(line => line.id === lineId);
+        const station = this.stations.find(station => station.id === stationId);
+
+        // Insert the station in the line
+        line.stationIds.splice(index, 0, station.id);
+
+        // Create the links between the stations
+        const prevStation = index - 1 >= 0 ? this.stations.find(station => station.id === line.stationIds[index - 1]) : null;
+        const nextStation = index + 1 < line.stationIds.length ? this.stations.find(station => station.id === line.stationIds[index + 1]) : null;
+        if (prevStation && !this.links[station.id].find(l => l.to === prevStation.id)) {
+            this.createLink(prevStation, station);
+        }
+        if (nextStation && !this.links[station.id].find(l => l.to === nextStation.id)) {
+            this.createLink(station, nextStation);
+        }
+
+        // Save modified data
+        Storage.save(Storage.keys.LINES, this.lines);
+        Storage.save(Storage.keys.LINKS, this.links.map(links => links.map(link => {
+            link.drawn = false;
+            return link;
+        })));
+        Storage.save(Storage.keys.STATIONS, this.stations.map(station => {
+            station.circle = null;
+            station.text = null;
+            return station;
+        }));
+
+        this.draw();
     }
 
 
@@ -222,6 +233,31 @@ export class GameRenderer {
         this.draw();
     }
 
+    /**
+         * Creates a link between two stations
+         * @param station1 
+         * @param station2 
+         */
+    private createLink(station1: Station, station2: Station) {
+        console.log("Creating links between stations", station1.id, station2.id);
+        // Create the links between the station and the line if it doesn't already exist
+        let link1: Link = {
+            from: station2.id,
+            to: station1.id,
+            tracks: 2,
+        };
+        this.links[station2.id].push(link1);
+        let link2: Link = {
+            from: station1.id,
+            to: station2.id,
+            tracks: 2,
+        };
+        this.links[station1.id].push(link2);
+
+        station2.linkedTo.push(station1.id);
+        station1.linkedTo.push(station2.id);
+    }
+
     draw() {
         // Reset scene drawing states
         this.two.clear();
@@ -238,10 +274,29 @@ export class GameRenderer {
             }
         }
 
-        // TODO: Draw the lines on top of the links
-        // this.drawTracks(link, 8, linesUsingLink.filter(l => !l.hidden).map(l => l.color), 1)
-        // link.drawn = true;
-        // TODO: function findPathToStation
+        // Draw each line
+        for (let i = 0; i < this.lines.length; i++) {
+            const line = this.lines[i];
+
+            if (!line.hidden) {
+                for (let i = 0; i < line.stationIds.length - 1; i++) {
+                    const idFrom = line.stationIds[i];
+                    const idTo = line.stationIds[i + 1];
+
+                    let path = this.findPath(idFrom, idTo);
+
+                    if (path.length > 0) {
+                        for (let i = 0; i < path.length - 1; i++) {
+                            const pIdFrom = path[i];
+                            const pIdTo = path[i + 1];
+
+                            let link = this.links[pIdFrom].find(l => l.to === pIdTo);
+                            this.drawTracks(link, 8, [line.color], 1)
+                        }
+                    }
+                }
+            }
+        }
 
         // Draw each station
         for (let i = 0; i < this.stations.length; i++) {
@@ -342,6 +397,42 @@ export class GameRenderer {
                 }
             }
         }
+    }
+
+    /**
+     * Finds the shortest path between two stations
+     * @param from Station ID
+     * @param to Station ID
+     */
+    private findPath(from: number, to: number, visited = new Set<number>()): number[] {
+        // End of the path, return the last station
+        if (from === to) {
+            return [to];
+        }
+
+        let fromStation = this.stations.find(s => s.id === from);
+        let toStation = this.stations.find(s => s.id === to);
+
+        if (!fromStation || !toStation) {
+            return [];
+        }
+
+        visited.add(from);
+        let currentPath = [];
+        for (let i = 0; i < fromStation.linkedTo.length; i++) {
+            const id = fromStation.linkedTo[i];
+
+            if (!visited.has(id)) {
+                let path = this.findPath(id, to, visited);
+
+                // If the path is not empty and the shortest, set it to the current path
+                if (currentPath.length === 0 || (path.length < currentPath.length && currentPath.length != 0)) {
+                    currentPath = path;
+                }
+            }
+        }
+        // Add the current station to the path only if the path is not empty
+        return currentPath.length > 0 ? [from, ...currentPath] : [];
     }
 
     private drawStation(station: Station, fill = "#8f9ebf") {

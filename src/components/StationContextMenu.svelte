@@ -113,7 +113,7 @@
 
 {#if station && open}
     <div class="m-4 p-4 rounded-lg bg-dark-100 text-slate-200 flex flex-col">
-        <span class="title text-white">{station.name}</span>
+        <span class="title text-white">{station.name} [{station.id}]</span>
         <!-- Links List -->
         {#if station.linkedTo.length > 0}
             <div class="subcontainer">

@@ -25,6 +25,7 @@
         stationIds: [],
         trains: [],
     };
+    // LINE
     function addLine() {
         lineFormElement.style.display = null;
         currentLineId = -1;
@@ -35,6 +36,8 @@
         let line = renderer.lines[currentLineId];
         currentLine = line;
     }
+
+    // FORM SAVE/CANCEL
     function cancelLineForm() {
         lineFormElement.style.display = "none";
         currentLine = {
@@ -58,14 +61,34 @@
         }
     }
 
-    let AddTrainDropdown: HTMLElement;
-    function addTrain(train: Train) {
-        renderer.addTrainToLine(currentLine.id, train.id);
+    // STATIONS
+    function removeStation(stationId: number) {
+        renderer.removeStationFromLine(currentLine.id, stationId);
+        renderer.draw();
+    }
+    function moveStationUp(stationId: number) {
+        let index = currentLine.stationIds.indexOf(stationId);
+        if (index > 0) {
+            renderer.removeStationFromLine(currentLine.id, stationId);
+            renderer.insertStationToLine(currentLine.id, stationId, index - 1);
+            renderer.draw();
+        }
+        renderer.draw();
+    }
+    function moveStationDown(stationId: number) {
+        let index = currentLine.stationIds.indexOf(stationId);
+        if (index < currentLine.stationIds.length - 1) {
+            renderer.removeStationFromLine(currentLine.id, stationId);
+            renderer.insertStationToLine(currentLine.id, stationId, index + 1);
+            renderer.draw();
+        }
         renderer.draw();
     }
 
-    function removeStation(stationId: number) {
-        renderer.removeStationFromLine(currentLine.id, stationId);
+    // TRAINS
+    let AddTrainDropdown: HTMLElement;
+    function addTrain(train: Train) {
+        renderer.addTrainToLine(currentLine.id, train.id);
         renderer.draw();
     }
 
@@ -145,20 +168,35 @@
                 </p>
             </span>
             <ul class="stations-list" style="--line-color: {currentLine.color}">
-                {#each currentLine.stationIds as stationId}
-                    <li class="inline-flex w-full row justify-between">
+                {#each currentLine.stationIds as stationId, i}
+                    <li
+                        class="inline-flex w-full row justify-between"
+                        data-index={i}
+                        data-station-id={stationId}
+                    >
                         <span />
                         <p class="w-full mr-2">
                             {renderer.stations[stationId].name}
                         </p>
                         <span>
                             <i
-                                class="fas fa-times"
+                                class="fas fa-chevron-down"
+                                on:click={() => {
+                                    moveStationDown(stationId);
+                                }}
+                            />
+                            <i
+                                class="ml-2 fas fa-chevron-up"
+                                on:click={() => {
+                                    moveStationUp(stationId);
+                                }}
+                            />
+                            <i
+                                class="ml-2 fas fa-times"
                                 on:click={() => {
                                     removeStation(stationId);
                                 }}
                             />
-                            <i class="ml-2 fas fa-grip-lines" />
                         </span>
                     </li>
                 {/each}
