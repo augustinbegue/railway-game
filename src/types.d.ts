@@ -74,6 +74,10 @@ export interface Line {
     stationIds: number[];
     hidden: boolean;
     trains: Train[];
+    trainSchedule: {
+        intervalSeconds: number;
+        stoppingTimeSeconds: number;
+    }
 }
 
 export interface Train {
@@ -83,10 +87,6 @@ export interface Train {
         maxSpeed: number;
         capacity: number;
     };
-    schedule: {
-        startTimeSeconds: number;
-        stoppingTimeSeconds: number;
-    }
     location: {
         position: Position;
         running: boolean;

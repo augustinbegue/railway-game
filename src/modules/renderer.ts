@@ -469,7 +469,7 @@ export class GameRenderer {
                     setTimeout(() => {
                         train.location.stopped = false;
                         console.log(`${train.info.name} Now going to station ${this.stations[newStation].name}`);
-                    }, train.schedule.stoppingTimeSeconds * 1000);
+                    }, line.trainSchedule.stoppingTimeSeconds * 1000);
                 }
             }
         }

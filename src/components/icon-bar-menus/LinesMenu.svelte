@@ -24,6 +24,10 @@
         hidden: false,
         stationIds: [],
         trains: [],
+        trainSchedule: {
+            intervalSeconds: 10 * 60,
+            stoppingTimeSeconds: 120,
+        },
     };
     // LINE
     function addLine() {
@@ -47,6 +51,10 @@
             hidden: false,
             stationIds: [],
             trains: [],
+            trainSchedule: {
+                intervalSeconds: 10 * 60,
+                stoppingTimeSeconds: 120,
+            },
         };
     }
     function submitLineForm() {
@@ -241,6 +249,20 @@
                     {/each}
                 </div>
             </div>
+            <span>
+                <p>Interval between trains:</p>
+                <input
+                    type="number"
+                    bind:value={currentLine.trainSchedule.intervalSeconds}
+                />
+            </span>
+            <span>
+                <p>Stopping time at stations:</p>
+                <input
+                    type="number"
+                    bind:value={currentLine.trainSchedule.stoppingTimeSeconds}
+                />
+            </span>
         </div>
         <div class="span">
             <span>
