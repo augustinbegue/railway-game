@@ -100,4 +100,5 @@ export interface Train {
         reverseTrip: boolean;
     };
     element: Two.Shape;
+    passengers: Passenger[];
 }

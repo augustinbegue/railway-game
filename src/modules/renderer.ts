@@ -456,13 +456,14 @@ export class GameRenderer {
 
                 train.location.percent = train.location.percent + distancePercent;
 
-                // Ended -> Get the next link
+                // Train Reached Station
                 if (train.location.percent > 100) {
+                    // Get the next station
                     train.location.percent = 0;
                     let currentStationId = line.stationIds[train.location.stationIndex];
                     train.location.stationIndex = train.location.reverseTrip ? train.location.stationIndex - 1 : train.location.stationIndex + 1;
 
-                    // Turn back
+                    // Turn back if reached end of line
                     if (train.location.stationIndex >= line.stationIds.length) {
                         train.location.reverseTrip = true;
                         train.location.stationIndex -= 2;
@@ -483,6 +484,9 @@ export class GameRenderer {
                     train.location.stopped = true;
                     train.location.stoppedTime = this.gameData.seconds;
                     console.log(`${train.info.name}#${train.id} is stopped for ${line.trainSchedule.stoppingTimeSeconds} seconds before going to ${this.stations[newStationId].name}`);
+
+                    // TODO: Disembark correct passengers
+                    // TODO: Pick up correct passengers
                 }
             }
         }
