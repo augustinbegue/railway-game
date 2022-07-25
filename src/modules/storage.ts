@@ -23,6 +23,8 @@ export class Storage {
             default:
                 break;
         }
+
+        localStorage.setItem(key, JSON.stringify(value));
     }
 
     static exists(key): boolean {

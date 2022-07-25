@@ -27,6 +27,7 @@
         trainSchedule: {
             intervalSeconds: 10 * 60,
             stoppingTimeSeconds: 120,
+            previousDepartureTime: 0,
         },
     };
     // LINE
@@ -54,6 +55,7 @@
             trainSchedule: {
                 intervalSeconds: 10 * 60,
                 stoppingTimeSeconds: 120,
+                previousDepartureTime: 0,
             },
         };
     }

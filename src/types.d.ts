@@ -77,6 +77,7 @@ export interface Line {
     trainSchedule: {
         intervalSeconds: number;
         stoppingTimeSeconds: number;
+        previousDepartureTime: number;
     }
 }
 
@@ -91,6 +92,7 @@ export interface Train {
         position: Position;
         running: boolean;
         stopped: boolean;
+        stoppedTime: number;
         stationIndex: number;
         currentLink: Link;
         percent: number;

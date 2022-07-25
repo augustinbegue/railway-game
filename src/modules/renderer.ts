@@ -127,7 +127,9 @@ export class GameRenderer {
 
     // Add a train to a line
     addTrainToLine(lineId: number, trainId: number) {
-        let newTrain = Object.assign({}, this.trains[trainId]);
+        // Ensure nothing is passed as a reference
+        let newTrain = JSON.parse(JSON.stringify(this.trains[trainId]));
+        newTrain.id = this.lines[lineId].trains.length;
         this.lines[lineId].trains.push(newTrain);
         Storage.save(Storage.keys.LINES, this.lines);
 
@@ -366,7 +368,7 @@ export class GameRenderer {
                         };
                         station.waitingPassengers = [...station.waitingPassengers, passenger];
 
-                        console.log("Added passenger", passenger, "to station", station.id, "-", station.name);
+                        // console.log("Added passenger", passenger, "to station", station.id, "-", station.name);
                     }
                 } else {
                     station.nextPassengerArrival -= elapsedTime;
@@ -395,7 +397,13 @@ export class GameRenderer {
                 const train = line.trains[i];
 
                 if (train.location.stopped) {
-                    continue;
+                    // Check if train stopping time is over
+                    if (this.gameData.seconds - train.location.stoppedTime >= line.trainSchedule.stoppingTimeSeconds) {
+                        train.location.stopped = false;
+                        let newStationId = line.stationIds[train.location.stationIndex];
+                        console.log(`${train.info.name}#${train.id} Now going to station ${this.stations[newStationId].name}`);
+                    } else
+                        continue;
                 }
 
                 // Train Animation
@@ -403,10 +411,17 @@ export class GameRenderer {
                     return;
                 }
 
-                // Get first link
+                // Train is not moving and we can start it => start its schedule
                 if (!train.location.currentLink) {
-                    train.location.currentLink = this.links[line.stationIds[0]].find(l => l.to === line.stationIds[1]);
-                    train.location.stationIndex = 1;
+                    if (this.gameData.seconds - line.trainSchedule.previousDepartureTime > line.trainSchedule.intervalSeconds) {
+                        console.log(`Starting ${train.info.name}#${train.id} on line ${line.name}#${line.id}`);
+
+                        line.trainSchedule.previousDepartureTime = this.gameData.seconds;
+                        train.location.currentLink = this.links[line.stationIds[0]].find(l => l.to === line.stationIds[1]);
+                        train.location.stationIndex = 1;
+                    } else {
+                        continue;
+                    }
                 }
 
                 let track: Two.Path;
@@ -444,7 +459,7 @@ export class GameRenderer {
                 // Ended -> Get the next link
                 if (train.location.percent > 100) {
                     train.location.percent = 0;
-                    let currentStation = line.stationIds[train.location.stationIndex];
+                    let currentStationId = line.stationIds[train.location.stationIndex];
                     train.location.stationIndex = train.location.reverseTrip ? train.location.stationIndex - 1 : train.location.stationIndex + 1;
 
                     // Turn back
@@ -456,20 +471,18 @@ export class GameRenderer {
                         train.location.stationIndex = 0;
                     }
 
-                    let newStation = line.stationIds[train.location.stationIndex];
+                    let newStationId = line.stationIds[train.location.stationIndex];
 
-                    console.log(`${train.info.name} Reached station ${this.stations[currentStation].name}`);
+                    console.log(`${train.info.name} Reached station ${this.stations[currentStationId].name}`);
 
                     // Get the next link
-                    train.location.currentLink = this.links[currentStation].find(l => l.to === newStation);
+                    train.location.currentLink = this.links[currentStationId].find(l => l.to === newStationId);
                     track = undefined;
 
                     // Pause the train for its stopping time
                     train.location.stopped = true;
-                    setTimeout(() => {
-                        train.location.stopped = false;
-                        console.log(`${train.info.name} Now going to station ${this.stations[newStation].name}`);
-                    }, line.trainSchedule.stoppingTimeSeconds * 1000);
+                    train.location.stoppedTime = this.gameData.seconds;
+                    console.log(`${train.info.name}#${train.id} is stopped for ${line.trainSchedule.stoppingTimeSeconds} seconds before going to ${this.stations[newStationId].name}`);
                 }
             }
         }
