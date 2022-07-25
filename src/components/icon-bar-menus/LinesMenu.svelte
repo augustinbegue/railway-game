@@ -90,12 +90,14 @@
     function addTrain(train: Train) {
         renderer.addTrainToLine(currentLine.id, train.id);
         renderer.draw();
+        toggleAddTrainDropdown();
     }
 
+    let toggleAddTrainDropdown: () => void;
     onMount(() => {
         cancelLineForm();
         InteractiveElements.Tabs(lineFormElement);
-        InteractiveElements.Dropdown(AddTrainDropdown);
+        toggleAddTrainDropdown = InteractiveElements.Dropdown(AddTrainDropdown);
     });
 </script>
 

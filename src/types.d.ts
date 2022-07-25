@@ -1,9 +1,10 @@
 import type Two from "src/two";
 
-export interface GameTime {
+export interface GameData {
     seconds: number;
     multiplicator: number;
     nextStationSpawn: number;
+    passengerId: number;
 }
 
 export interface Position {
@@ -37,7 +38,25 @@ export interface Station {
     circle?: any;
     text?: any;
     spawned: boolean;
-    waitingPassengers: number;
+    // Passengers in the station
+    waitingPassengers: Passenger[];
+    // Max number of passengers that can be waiting at this station
+    waitingPassengersMax: number;
+    // Number of passengers arriving at this station per minute
+    passengersArrivalRate: number;
+    // Next time a passenger will arrive at this station
+    nextPassengerArrival: number;
+}
+
+export interface Passenger {
+    id: number;
+    name: string;
+    startStationId: number;
+    endStationId: number;
+    itinerary: number[];
+    startTime: number;
+    endTime: number;
+    waiting: boolean;
 }
 
 // Graph Edges

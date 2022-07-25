@@ -20,6 +20,10 @@ function Dropdown(container: HTMLElement) {
     dropdownToggle.addEventListener("click", () => {
         dropdownContent.classList.toggle("active");
     });
+
+    return () => {
+        dropdownContent.classList.toggle("active");
+    };
 }
 
 export const InteractiveElements = {

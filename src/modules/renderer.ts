@@ -1,15 +1,16 @@
 import Two from "two.js";
-import type { GameMap, GameTime, Line, Link, Station, Train } from "../types";
+import type { GameMap, GameData, Line, Link, Station, Train, Passenger } from "../types";
 import { Storage } from "./storage";
 
 
 export class GameRenderer {
     two: Two;
 
-    gameTime: GameTime = {
+    gameData: GameData = {
         multiplicator: 1,
         seconds: 12 * 60 * 60,
         nextStationSpawn: 0,
+        passengerId: 0,
     };
 
     map: GameMap;
@@ -19,11 +20,11 @@ export class GameRenderer {
     lines: Line[] = [];
     trains: Train[] = [];
 
-    constructor(map: GameMap, stations: Station[], lines: Line[]) {
+    constructor(map: GameMap, stations: Station[], lines: Line[], trains: Train[]) {
         this.map = map;
         this.stations = stations;
         this.lines = lines;
-        this.trains = Storage.get(Storage.keys.TRAINS) || [];
+        this.trains = trains;
 
         this.two = new Two({
             fullscreen: true,
@@ -307,28 +308,80 @@ export class GameRenderer {
 
     update(frameCount: number, timeDelta: number) {
         // Updating GameTime
-        let elapsedTime = (timeDelta / 1000) * this.gameTime.multiplicator;
-        this.gameTime.seconds += (timeDelta / 1000) * this.gameTime.multiplicator;
+        let elapsedTime = (timeDelta / 1000) * this.gameData.multiplicator;
+        this.gameData.seconds += (timeDelta / 1000) * this.gameData.multiplicator;
+
+        // Game Data
+        // TODO: Move this to a separate class
+        let stationSpawnTime = 120;
+        let stationSpawnTimeVariation = 30;
+        let passengerArrivalInterval = 60;
+        let passengerArrivalIntervalVariation = 30;
 
         // Update stations spawn time
-        let stationSpawnTime = 120;
-        if (this.gameTime.nextStationSpawn <= 0) {
-            this.gameTime.nextStationSpawn = (Math.random() + 1) * stationSpawnTime;
+        if (this.gameData.nextStationSpawn <= 0) {
+            this.gameData.nextStationSpawn = stationSpawnTime + Math.random() * stationSpawnTimeVariation;
             let i = 0
             for (; i < this.stations.length && this.stations[i].spawned; i++) { }
 
             if (i < this.stations.length) {
                 console.log("Spawning station", i);
+                // Spawn station and set its initial values
                 this.stations[i].spawned = true;
+
+                this.stations[i].waitingPassengers = [];
+                this.stations[i].waitingPassengersMax = 100;
+                this.stations[i].passengersArrivalRate = 1;
+                this.stations[i].nextPassengerArrival = passengerArrivalInterval + Math.random() * passengerArrivalIntervalVariation;
+
                 this.draw();
-                Storage.save(Storage.keys.STATIONS, this.stations.map(station => {
-                    station.circle = null;
-                    station.text = null;
-                    return station;
-                }));
             }
         } else {
-            this.gameTime.nextStationSpawn -= elapsedTime;
+            this.gameData.nextStationSpawn -= elapsedTime;
+        }
+        let spawnedStations = this.stations.filter(s => s.spawned);
+
+        // Update station passengers
+        for (let i = 0; i < this.stations.length; i++) {
+            const station = this.stations[i];
+
+            if (station.spawned) {
+                if (station.nextPassengerArrival <= 0) {
+                    let availableStations = spawnedStations.filter(s => s.id !== station.id);
+                    let destinationStation = availableStations[Math.floor(Math.random() * availableStations.length)];
+
+                    if (destinationStation) {
+                        station.nextPassengerArrival = (passengerArrivalInterval + Math.random() * passengerArrivalIntervalVariation) / station.passengersArrivalRate;
+
+                        let passenger: Passenger =
+                        {
+                            id: this.gameData.passengerId++,
+                            name: "Passenger " + this.gameData.passengerId,
+                            startStationId: station.id,
+                            endStationId: destinationStation.id,
+                            itinerary: this.findPath(station.id, destinationStation.id),
+                            startTime: this.gameData.seconds,
+                            endTime: 0,
+                            waiting: true,
+                        };
+                        station.waitingPassengers = [...station.waitingPassengers, passenger];
+
+                        console.log("Added passenger", passenger, "to station", station.id, "-", station.name);
+                    }
+                } else {
+                    station.nextPassengerArrival -= elapsedTime;
+                }
+            }
+        }
+
+        // Update passengers itineraries
+        for (let i = 0; i < this.stations.length; i++) {
+            const station = this.stations[i];
+            for (let j = 0; j < station.waitingPassengers.length; j++) {
+                const p = station.waitingPassengers[j];
+                if (p.waiting && p.itinerary.length === 0)
+                    p.itinerary = this.findPath(p.startStationId, p.endStationId);
+            }
         }
 
         // Update Trains on each line
@@ -383,7 +436,7 @@ export class GameRenderer {
 
                 let meters = Math.sqrt(Math.pow(stationFrom.position.x - stationTo.position.x, 2) + Math.pow(stationFrom.position.y - stationTo.position.y, 2)) * 10
                 let metersByMillisecond = train.info.maxSpeed * 1000 / 360000;
-                let distanceTraveled = metersByMillisecond * timeDelta * this.gameTime.multiplicator;
+                let distanceTraveled = metersByMillisecond * timeDelta * this.gameData.multiplicator;
                 let distancePercent = distanceTraveled / meters;
 
                 train.location.percent = train.location.percent + distancePercent;

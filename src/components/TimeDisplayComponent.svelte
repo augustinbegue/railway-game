@@ -8,20 +8,20 @@
     let timestring = "12:00:00";
 
     const updateTime = () => {
-        let hours = Math.floor(renderer.gameTime.seconds / 3600);
-        let minutes = Math.floor(renderer.gameTime.seconds / 60 - hours * 60);
+        let hours = Math.floor(renderer.gameData.seconds / 3600);
+        let minutes = Math.floor(renderer.gameData.seconds / 60 - hours * 60);
         let seconds = Math.floor(
-            renderer.gameTime.seconds - (minutes * 60 + hours * 3600)
+            renderer.gameData.seconds - (minutes * 60 + hours * 3600),
         );
         timestring = `${hours}:${minutes < 10 ? `0${minutes}` : minutes}:${
             seconds < 10 ? `0${seconds}` : seconds
         }`;
 
-        setTimeout(updateTime, 900 / renderer.gameTime.multiplicator);
+        setTimeout(updateTime, 900 / renderer.gameData.multiplicator);
     };
 
     onMount(() => {
-        setTimeout(updateTime, 900 / renderer.gameTime.multiplicator);
+        setTimeout(updateTime, 900 / renderer.gameData.multiplicator);
     });
 
     let step = 0;
@@ -43,7 +43,7 @@
             multiplicator = 100;
         }
 
-        renderer.gameTime.multiplicator = multiplicator;
+        renderer.gameData.multiplicator = multiplicator;
     }
 </script>
 
@@ -56,7 +56,7 @@
         </span>
         <div class="inline-flex ml-2">
             <span class="font-semibold">
-                x{renderer.gameTime.multiplicator}
+                x{renderer.gameData.multiplicator}
             </span>
             <span class="text-sm inline-flex items-center">
                 <i

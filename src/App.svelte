@@ -1,5 +1,12 @@
 <script lang="ts">
-    import type { GameMap, Line, Station, Link, Position } from "./types";
+    import type {
+        GameMap,
+        Line,
+        Station,
+        Link,
+        Position,
+        Train,
+    } from "./types";
     import Two from "two.js";
     import { onMount } from "svelte";
     import { GameRenderer } from "./modules/renderer";
@@ -7,6 +14,7 @@
     import IconBarMenus from "./components/icon-bar-menus/IconBarMenus.svelte";
     import TimeDisplayComponent from "./components/TimeDisplayComponent.svelte";
     import stationsJSON from "./data/scraping/stations-rer.json";
+    import trainsJSON from "./data/trains/rer.json";
     import { Storage } from "./modules/storage";
 
     let map: GameMap = {
@@ -35,7 +43,10 @@
                 linkedTo: [],
                 size: 10,
                 spawned: false,
-                waitingPassengers: 0,
+                waitingPassengers: [],
+                waitingPassengersMax: 0,
+                passengersArrivalRate: 0,
+                nextPassengerArrival: 0,
             });
         }
     }
@@ -43,6 +54,43 @@
     let lines: Line[] = Storage.exists(Storage.keys.LINES)
         ? Storage.get(Storage.keys.LINES)
         : [];
+
+    let trains: Train[] = Storage.exists(Storage.keys.TRAINS)
+        ? Storage.get(Storage.keys.TRAINS)
+        : [];
+
+    if (trains.length === 0) {
+        for (let i = 0; i < trainsJSON.length; i++) {
+            const t = trainsJSON[i];
+
+            trains.push({
+                id: trains.length,
+                info: {
+                    name: t.info.name,
+                    maxSpeed: parseInt(t.info.maxSpeed),
+                    capacity: parseInt(t.info.capacity),
+                },
+                schedule: {
+                    startTimeSeconds: 0,
+                    stoppingTimeSeconds: 0,
+                },
+                location: {
+                    running: false,
+                    stopped: false,
+                    stationIndex: 0,
+                    currentLink: null,
+                    percent: 0,
+                    trackIsForward: true,
+                    reverseTrip: false,
+                    position: {
+                        x: 0,
+                        y: 0,
+                    },
+                },
+                element: null,
+            });
+        }
+    }
 
     // Drawing constants
     let renderer: GameRenderer;
@@ -55,7 +103,7 @@
     let minscale = 0.1;
 
     onMount(() => {
-        renderer = new GameRenderer(map, stations, lines);
+        renderer = new GameRenderer(map, stations, lines, trains);
 
         document.body.onwheel = (e) => {
             const amount = e.deltaY < 0 ? -0.1 : 0.1;

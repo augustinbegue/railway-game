@@ -9,6 +9,7 @@
     export let station: Station;
     export let open = false;
 
+    // Track Management
     function increaseTrackNumber(from: number, to: number) {
         let input = document.querySelector(
             `#link${from}tracks`,
@@ -24,7 +25,6 @@
 
         setTrackNumber(from, to, parseInt(input.value));
     }
-
     function decreaseTrackNumber(from: number, to: number) {
         let input = document.querySelector(
             `#link${from}tracks`,
@@ -40,7 +40,6 @@
 
         setTrackNumber(from, to, parseInt(input.value));
     }
-
     function setTrackNumber(from: number, to: number, tracks: number) {
         if (from === to) {
             return;
@@ -64,6 +63,7 @@
         renderer.draw();
     }
 
+    // Line Management
     let addToLineToggle = false;
     let addToLineSelect: HTMLSelectElement;
     $: linesNotInStation = renderer.lines?.filter(
@@ -85,6 +85,12 @@
             (l) => !l.stationIds.includes(station.id),
         );
     }
+
+    // Passengers Information
+    $: passengersDestinations = station?.waitingPassengers.reduce((acc, p) => {
+        acc[p.endStationId] = (acc[p.endStationId] || 0) + 1;
+        return acc;
+    }, []);
 </script>
 
 <!-- Add To Line Form -->
@@ -114,6 +120,27 @@
 {#if station && open}
     <div class="m-4 p-4 rounded-lg bg-dark-100 text-slate-200 flex flex-col">
         <span class="title text-white">{station.name} [{station.id}]</span>
+        <!-- Station Info -->
+        <div class="subcontainer">
+            <span class="subtitle text-white">Passengers Waiting</span>
+            <span class="subtitle text-gray-400">
+                {station.waitingPassengers
+                    .length}/{station.waitingPassengersMax}
+            </span>
+            <span class="subtitle text-white">Destinations</span>
+            <div class="container-grid gap-1">
+                {#each passengersDestinations as passengers, id}
+                    {#if passengers > 0}
+                        <span class="subsubtitle text-white">
+                            <span class="text-gray-400">
+                                {passengers}
+                            </span>
+                            {renderer.stations[id].name}
+                        </span>
+                    {/if}
+                {/each}
+            </div>
+        </div>
         <!-- Links List -->
         {#if station.linkedTo.length > 0}
             <div class="subcontainer">
