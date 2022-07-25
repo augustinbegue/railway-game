@@ -316,9 +316,17 @@ export class GameRenderer {
             this.gameTime.nextStationSpawn = (Math.random() + 1) * stationSpawnTime;
             let i = 0
             for (; i < this.stations.length && this.stations[i].spawned; i++) { }
-            console.log("Spawning station", i);
-            this.stations[i].spawned = true;
-            this.draw();
+
+            if (i < this.stations.length) {
+                console.log("Spawning station", i);
+                this.stations[i].spawned = true;
+                this.draw();
+                Storage.save(Storage.keys.STATIONS, this.stations.map(station => {
+                    station.circle = null;
+                    station.text = null;
+                    return station;
+                }));
+            }
         } else {
             this.gameTime.nextStationSpawn -= elapsedTime;
         }
