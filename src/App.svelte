@@ -64,19 +64,16 @@
             const t = trainsJSON[i];
 
             trains.push({
-                id: trains.length,
+                id: i,
                 info: {
                     name: t.info.name,
                     maxSpeed: parseInt(t.info.maxSpeed),
                     capacity: parseInt(t.info.capacity),
                 },
-                schedule: {
-                    startTimeSeconds: 0,
-                    stoppingTimeSeconds: 0,
-                },
                 location: {
                     running: false,
                     stopped: false,
+                    stoppedTime: 0,
                     stationIndex: 0,
                     currentLink: null,
                     percent: 0,
@@ -88,6 +85,7 @@
                     },
                 },
                 element: null,
+                passengers: [],
             });
         }
     }

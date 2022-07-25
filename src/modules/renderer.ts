@@ -414,6 +414,9 @@ export class GameRenderer {
                 // Train is not moving and we can start it => start its schedule
                 if (!train.location.currentLink) {
                     if (this.gameData.seconds - line.trainSchedule.previousDepartureTime > line.trainSchedule.intervalSeconds) {
+                        // Check if passengers need to board
+                        this.boardPassengersToTrain(train, line.stationIds[0], line.stationIds[1]);
+
                         console.log(`Starting ${train.info.name}#${train.id} on line ${line.name}#${line.id}`);
 
                         line.trainSchedule.previousDepartureTime = this.gameData.seconds;
@@ -485,9 +488,53 @@ export class GameRenderer {
                     train.location.stoppedTime = this.gameData.seconds;
                     console.log(`${train.info.name}#${train.id} is stopped for ${line.trainSchedule.stoppingTimeSeconds} seconds before going to ${this.stations[newStationId].name}`);
 
-                    // TODO: Disembark correct passengers
-                    // TODO: Pick up correct passengers
+                    // Check if passengers need to disembark
+                    this.disembarkPassengersFromTrain(train, currentStationId, newStationId);
+
+                    // Check if passengers need to board
+                    this.boardPassengersToTrain(train, currentStationId, newStationId);
                 }
+            }
+        }
+    }
+
+    private disembarkPassengersFromTrain(train: Train, currentStationId: number, newStationId: number) {
+        let currentStation = this.stations[currentStationId];
+
+        for (let i = 0; i < train.passengers.length; i++) {
+            const p = train.passengers[i];
+
+            // A Passenger needs to disembark if:
+            // - It is at the end of its itinerary
+            // - The next station on the itinerary is not the same as the next station of the train
+            let currentStationItineraryIndex = p.itinerary.indexOf(currentStationId);
+            if ((p.itinerary.length - 1 === currentStationItineraryIndex) || (p.itinerary[currentStationItineraryIndex + 1] !== newStationId)) {
+                // Disembark the passenger
+                console.log(`${p.name} disembarked from ${train.info.name}#${train.id}`);
+                train.passengers.splice(i, 1);
+                i--;
+
+                // If the passenger is at the end of its itinerary, don't add it to the station waiting list
+                if (p.itinerary.length - 1 != currentStationItineraryIndex)
+                    currentStation.waitingPassengers.push(p);
+            }
+        }
+    }
+
+    private boardPassengersToTrain(train: Train, currentStationId: number, newStationId: number) {
+        let currentStation = this.stations[currentStationId];
+
+        for (let i = 0; i < currentStation.waitingPassengers.length; i++) {
+            const p = currentStation.waitingPassengers[i];
+            // A passenger can board if:
+            // - The next station on the itinerary is the same as the next station of the train
+            let currentStationItineraryIndex = p.itinerary.indexOf(currentStationId);
+            if (p.itinerary[currentStationItineraryIndex + 1] === newStationId) {
+                // Board the passenger
+                console.log(`${p.name} boarded ${train.info.name}#${train.id}`);
+                train.passengers.push(p);
+                currentStation.waitingPassengers.splice(i, 1);
+                i--;
             }
         }
     }

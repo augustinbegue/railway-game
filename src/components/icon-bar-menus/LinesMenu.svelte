@@ -1,8 +1,10 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import { lines } from "../../data/test";
     import { InteractiveElements } from "../../modules/interactive-elements";
     import type { GameRenderer } from "../../modules/renderer";
     import type { Line, Train } from "../../types";
+    import TrainsMenu from "./TrainsMenu.svelte";
 
     export let renderer: GameRenderer;
     function toggleLine(el: HTMLElement, lineIndex: number) {
@@ -226,7 +228,27 @@
             <ul class="trains-list">
                 {#each currentLine.trains as train}
                     <li>
-                        {train.info.name}
+                        {train.info.name}#{train.id}
+                        {#if train.location.currentLink}
+                            - {train.passengers.length}/{train.info.capacity}
+                            - {#if train.location.stopped}
+                                {renderer.stations[
+                                    currentLine.stationIds[
+                                        train.location.stationIndex
+                                    ]
+                                ].name}
+                            {:else}
+                                {renderer.stations[
+                                    currentLine.stationIds[
+                                        train.location.stationIndex
+                                    ]
+                                ].name} -> {renderer.stations[
+                                    currentLine.stationIds[
+                                        train.location.stationIndex + 1
+                                    ]
+                                ].name}
+                            {/if}
+                        {/if}
                     </li>
                 {/each}
             </ul>
