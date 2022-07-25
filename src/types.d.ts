@@ -3,6 +3,7 @@ import type Two from "src/two";
 export interface GameTime {
     seconds: number;
     multiplicator: number;
+    nextStationSpawn: number;
 }
 
 export interface Position {
@@ -35,6 +36,8 @@ export interface Station {
     size: number;
     circle?: any;
     text?: any;
+    spawned: boolean;
+    waitingPassengers: number;
 }
 
 // Graph Edges

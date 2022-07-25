@@ -8,7 +8,8 @@ export class GameRenderer {
 
     gameTime: GameTime = {
         multiplicator: 1,
-        seconds: 12 * 60 * 60
+        seconds: 12 * 60 * 60,
+        nextStationSpawn: 0,
     };
 
     map: GameMap;
@@ -306,7 +307,21 @@ export class GameRenderer {
 
     update(frameCount: number, timeDelta: number) {
         // Updating GameTime
+        let elapsedTime = (timeDelta / 1000) * this.gameTime.multiplicator;
         this.gameTime.seconds += (timeDelta / 1000) * this.gameTime.multiplicator;
+
+        // Update stations spawn time
+        let stationSpawnTime = 120;
+        if (this.gameTime.nextStationSpawn <= 0) {
+            this.gameTime.nextStationSpawn = (Math.random() + 1) * stationSpawnTime;
+            let i = 0
+            for (; i < this.stations.length && this.stations[i].spawned; i++) { }
+            console.log("Spawning station", i);
+            this.stations[i].spawned = true;
+            this.draw();
+        } else {
+            this.gameTime.nextStationSpawn -= elapsedTime;
+        }
 
         // Update Trains on each line
         for (let i = 0; i < this.lines.length; i++) {
@@ -438,6 +453,9 @@ export class GameRenderer {
     private drawStation(station: Station, fill = "#8f9ebf") {
         // TODO: Implement station colors
 
+        if (!station.spawned)
+            return;
+
         if (station.circle) {
             station.circle.remove();
         }
@@ -473,8 +491,6 @@ export class GameRenderer {
 
         for (let i = 0; i < linkAdjList.length; i++) {
             const link = linkAdjList[i];
-
-            let linesUsingLink = this.getLinesUsingLink(link);
 
             if (!link.drawn) {
                 this.tracks[link.from][link.to] = [];

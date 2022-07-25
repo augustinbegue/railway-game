@@ -34,6 +34,8 @@
                 lineIds: [],
                 linkedTo: [],
                 size: 10,
+                spawned: false,
+                waitingPassengers: 0,
             });
         }
     }
