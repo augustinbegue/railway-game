@@ -16,6 +16,7 @@
     import stationsJSON from "./data/scraping/stations-rer.json";
     import trainsJSON from "./data/trains/rer.json";
     import { Storage } from "./modules/storage";
+    import StatsDisplayComponent from "./components/StatsDisplayComponent.svelte";
 
     let map: GameMap = {
         startLat: "49.467176211864015",
@@ -202,8 +203,9 @@
 </script>
 
 {#if renderer}
-    <div class="w-full absolute z-20">
+    <div class="absolute right-0 z-20">
         <TimeDisplayComponent {renderer} />
+        <StatsDisplayComponent {renderer} />
     </div>
     <div class="h-full w-full absolute z-10">
         <IconBarMenus {renderer} />

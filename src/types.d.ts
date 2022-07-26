@@ -1,10 +1,22 @@
 import type Two from "src/two";
 
 export interface GameData {
-    seconds: number;
-    multiplicator: number;
-    nextStationSpawn: number;
-    passengerId: number;
+    time: {
+        multiplicator: number,
+        seconds: number,
+        nextStationSpawn: number,
+    },
+    stats: {
+        passengersCreated: number,
+        passengersServed: number,
+    },
+    settings: {
+        stationStartNumber: number,
+        stationSpawnTime: number,
+        stationSpawnTimeVariation: number,
+        passengerArrivalInterval: number,
+        passengerArrivalIntervalVariation: number,
+    }
 }
 
 export interface Position {
