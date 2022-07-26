@@ -217,36 +217,64 @@
             </ul>
         </div>
         <div class="box-tabs-content">
-            <span>
+            <div>
                 <p>
-                    {#key currentLine.trains}
-                        <!-- TODO: Line capacity -->
-                        Count: {currentLine.trains.length}
-                    {/key}
+                    Count: {currentLine.trains.length}
                 </p>
-            </span>
+                <p>
+                    Time interval: {Math.round(
+                        currentLine.trainSchedule.intervalSeconds / 60,
+                    )}min
+                </p>
+                <p>
+                    Train last departed {Math.round(
+                        (renderer.gameData.time.seconds -
+                            currentLine.trainSchedule.previousDepartureTime) /
+                            60,
+                    )}min ago
+                </p>
+            </div>
             <ul class="trains-list">
                 {#each currentLine.trains as train}
                     <li>
                         {train.info.name}#{train.id}
                         {#if train.location.currentLink}
                             | {train.passengers.length}/{train.info.capacity}
-                            | {#if train.location.stopped && train.location.stationIndex}
+                            |
+                            {#if train.location.stopped && train.location.stationIndex}
+                                Stopped: {renderer.stations[
+                                    currentLine.stationIds[
+                                        train.location.reverseTrip
+                                            ? train.location.stationIndex + 1
+                                            : train.location.stationIndex - 1
+                                    ]
+                                ]?.name}
+                            {:else if train.location.stationIndex && train.location.stationIndex < currentLine.stationIds.length && !train.location.reverseTrip}
                                 {renderer.stations[
                                     currentLine.stationIds[
                                         train.location.stationIndex - 1
                                     ]
-                                ].name}
-                            {:else if train.location.stationIndex && train.location.stationIndex < currentLine.stationIds.length}
-                                {renderer.stations[
-                                    currentLine.stationIds[
-                                        train.location.stationIndex - 1
-                                    ]
-                                ].name} -> {renderer.stations[
+                                ]?.name} -> {renderer.stations[
                                     currentLine.stationIds[
                                         train.location.stationIndex
                                     ]
-                                ].name}
+                                ]?.name}
+                            {:else if train.location.stationIndex && train.location.stationIndex + 1 < currentLine.stationIds.length && train.location.reverseTrip}
+                                {renderer.stations[
+                                    currentLine.stationIds[
+                                        train.location.stationIndex + 1
+                                    ]
+                                ]?.name} -> {renderer.stations[
+                                    currentLine.stationIds[
+                                        train.location.stationIndex
+                                    ]
+                                ]?.name}
+                            {:else}
+                                Terminus: {renderer.stations[
+                                    currentLine.stationIds[
+                                        train.location.stationIndex - 1
+                                    ]
+                                ]?.name}
                             {/if}
                         {/if}
                     </li>
