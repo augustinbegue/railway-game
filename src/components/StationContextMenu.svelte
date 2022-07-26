@@ -88,7 +88,9 @@
 
     // Passengers Information
     $: passengersDestinations = station?.waitingPassengers.reduce((acc, p) => {
-        acc[p.endStationId] = (acc[p.endStationId] || 0) + 1;
+        if (p.itinerary.length > 0) {
+            acc.push(p.itinerary[0]);
+        }
         return acc;
     }, []);
 </script>
@@ -119,7 +121,17 @@
 
 {#if station && open}
     <div class="m-4 p-4 rounded-lg bg-dark-100 text-slate-200 flex flex-col">
-        <span class="title text-white">{station.name} [{station.id}]</span>
+        <div class="flex flex-row justify-between">
+            <span class="title text-white">{station.name} [{station.id}]</span>
+            <span class="cursor-pointer">
+                <i
+                    class="fas fa-times"
+                    on:click={() => {
+                        station = null;
+                    }}
+                />
+            </span>
+        </div>
         <!-- Station Info -->
         <div class="subcontainer">
             <span class="subtitle text-white">Passengers Waiting</span>
@@ -127,11 +139,15 @@
                 {station.waitingPassengers
                     .length}/{station.waitingPassengersMax}
             </span>
-            <span class="subtitle text-white">Destinations</span>
-            <div class="container-grid gap-1">
+        </div>
+        <span class="subtitle text-white">Destinations</span>
+        <div class="subcontainer">
+            <div
+                class="flex flex-row justify-start items-center flex-nowrap flex-shrink-0 gap-2 divide-x divide-dashed"
+            >
                 {#each passengersDestinations as passengers, id}
                     {#if passengers > 0}
-                        <span class="subsubtitle text-white">
+                        <span class="pl-2 subsubtitle text-white">
                             <span class="text-gray-400">
                                 {passengers}
                             </span>

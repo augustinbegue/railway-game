@@ -1,4 +1,6 @@
 import Two from "two.js";
+import type { Path } from "two.js/src/path";
+import type { Line as TwoLine } from "two.js/src/shapes/line";
 import type { GameMap, GameData, Line, Link, Station, Train, Passenger } from "../types";
 import { Storage } from "./storage";
 
@@ -427,7 +429,7 @@ export class GameRenderer {
                     }
                 }
 
-                let track: Two.Path;
+                let track: Path;
                 // Get first track of link and its direction
                 if (!track) {
                     train.location.trackIsForward = true;
@@ -444,7 +446,7 @@ export class GameRenderer {
 
                 train.element?.remove();
                 if (track) {
-                    let point = track.getPointAt(train.location.trackIsForward ? (train.location.percent / 100) : 1 - (train.location.percent / 100));
+                    let point = track.getPointAt(train.location.trackIsForward ? (train.location.percent / 100) : 1 - (train.location.percent / 100), null);
                     train.element = this.two.makeCircle(point.x, point.y, 1, 1);
                     train.location.position = { x: point.x, y: point.y };
                 }
@@ -630,7 +632,7 @@ export class GameRenderer {
         }
     }
 
-    private drawTracks(link: Link, width: number, colors = ["#626c80"], count?): Two.Line[] {
+    private drawTracks(link: Link, width: number, colors = ["#626c80"], count?): TwoLine[] {
         let fromStation = this.stations[link.from];
         let toStation = this.stations[link.to];
 
@@ -645,7 +647,7 @@ export class GameRenderer {
         let num = count || link.tracks;
 
 
-        let lines = [];
+        let lines: TwoLine[] = [];
         if (colors.length === 1) {
             // In this case, we draw the actual tracks
             let offset = -(num - 1);
@@ -674,8 +676,8 @@ export class GameRenderer {
                 );
                 line.linewidth = width;
                 line.stroke = color;
-                line.dashes = [10, 10]
-                line.dashes.offset = offset;
+                (line as any).dashes = [10, 10];
+                (line.dashes as any).offset = offset;
                 lines.push(line);
             }
         }

@@ -230,21 +230,21 @@
                     <li>
                         {train.info.name}#{train.id}
                         {#if train.location.currentLink}
-                            - {train.passengers.length}/{train.info.capacity}
-                            - {#if train.location.stopped}
+                            | {train.passengers.length}/{train.info.capacity}
+                            | {#if train.location.stopped && train.location.stationIndex}
                                 {renderer.stations[
                                     currentLine.stationIds[
-                                        train.location.stationIndex
+                                        train.location.stationIndex - 1
                                     ]
                                 ].name}
-                            {:else}
+                            {:else if train.location.stationIndex && train.location.stationIndex < currentLine.stationIds.length}
                                 {renderer.stations[
                                     currentLine.stationIds[
-                                        train.location.stationIndex
+                                        train.location.stationIndex - 1
                                     ]
                                 ].name} -> {renderer.stations[
                                     currentLine.stationIds[
-                                        train.location.stationIndex + 1
+                                        train.location.stationIndex
                                     ]
                                 ].name}
                             {/if}
