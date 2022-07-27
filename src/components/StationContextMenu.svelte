@@ -79,7 +79,6 @@
     }
     function addToLine() {
         let id = addToLineSelect.value;
-        console.log("Adding station ", station.id, " to line ", id);
         renderer.addStationToLine(parseInt(id), station.id);
         linesNotInStation = renderer.lines.filter(
             (l) => !l.stationIds.includes(station.id),
@@ -88,9 +87,7 @@
 
     // Passengers Information
     $: passengersDestinations = station?.waitingPassengers.reduce((acc, p) => {
-        if (p.itinerary.length > 0) {
-            acc.push(p.itinerary[0]);
-        }
+        acc[p.endStationId] = (acc[p.endStationId] || 0) + 1;
         return acc;
     }, []);
 </script>

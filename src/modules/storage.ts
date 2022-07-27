@@ -6,6 +6,7 @@ export class Storage {
         LINKS: "links",
         STATIONS: "stations",
         TRAINS: "trains",
+        GAMEDATA: "gamedata",
     }
 
     static save(key: string, value: object) {

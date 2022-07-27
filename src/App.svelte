@@ -6,6 +6,7 @@
         Link,
         Position,
         Train,
+        GameData,
     } from "./types";
     import Two from "two.js";
     import { onMount } from "svelte";
@@ -91,6 +92,27 @@
         }
     }
 
+    let gameData: GameData = Storage.exists(Storage.keys.GAMEDATA)
+        ? Storage.get(Storage.keys.GAMEDATA)
+        : {
+              time: {
+                  multiplicator: 1,
+                  seconds: 12 * 60 * 60,
+                  nextStationSpawn: 0,
+              },
+              stats: {
+                  passengersCreated: 0,
+                  passengersServed: 0,
+              },
+              settings: {
+                  stationStartNumber: 3,
+                  stationSpawnTime: 600,
+                  stationSpawnTimeVariation: 120,
+                  passengerArrivalInterval: 60,
+                  passengerArrivalIntervalVariation: 30,
+              },
+          };
+
     // Drawing constants
     let renderer: GameRenderer;
 
@@ -102,7 +124,7 @@
     let minscale = 0.1;
 
     onMount(() => {
-        renderer = new GameRenderer(map, stations, lines, trains);
+        renderer = new GameRenderer(map, gameData, stations, lines, trains);
 
         document.body.onwheel = (e) => {
             const amount = e.deltaY < 0 ? -0.1 : 0.1;
