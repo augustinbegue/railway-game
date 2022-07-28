@@ -280,6 +280,20 @@ export class GameRenderer {
         station1.linkedTo.push(station2.id);
     }
 
+    deleteLink(station1Id: number, station2Id: number) {
+        this.links[station1Id].splice(this.links[station1Id].findIndex(l => l.to === station2Id), 1);
+        this.links[station2Id].splice(this.links[station2Id].findIndex(l => l.to === station1Id), 1);
+
+        this.stations[station1Id].linkedTo.splice(this.stations[station1Id].linkedTo.indexOf(station2Id), 1);
+        this.stations[station2Id].linkedTo.splice(this.stations[station2Id].linkedTo.indexOf(station1Id), 1);
+
+        Storage.save(Storage.keys.LINKS, this.links.map(links => links.map(link => {
+            link.drawn = false;
+            return link;
+        })));
+        this.draw();
+    }
+
     draw() {
         Storage.save(Storage.keys.GAMEDATA, this.gameData);
 

@@ -1,10 +1,8 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { lines } from "../../data/test";
     import { InteractiveElements } from "../../modules/interactive-elements";
     import type { GameRenderer } from "../../modules/renderer";
     import type { Line, Train } from "../../types";
-    import TrainsMenu from "./TrainsMenu.svelte";
 
     export let renderer: GameRenderer;
     function toggleLine(el: HTMLElement, lineIndex: number) {
@@ -78,23 +76,23 @@
         renderer.removeStationFromLine(currentLine.id, stationId);
         renderer.draw();
     }
-    function moveStationUp(stationId: number) {
-        let index = currentLine.stationIds.indexOf(stationId);
-        if (index > 0) {
-            renderer.removeStationFromLine(currentLine.id, stationId);
-            renderer.insertStationToLine(currentLine.id, stationId, index - 1);
-            renderer.draw();
-        }
-        renderer.draw();
+    let movedStationId: number;
+    let movedStationEl: HTMLElement;
+    function moveStation(el: HTMLElement, stationId: number) {
+        movedStationId = stationId;
+        movedStationEl = el;
+        el.style.opacity = "0.5";
     }
-    function moveStationDown(stationId: number) {
-        let index = currentLine.stationIds.indexOf(stationId);
-        if (index < currentLine.stationIds.length - 1) {
-            renderer.removeStationFromLine(currentLine.id, stationId);
-            renderer.insertStationToLine(currentLine.id, stationId, index + 1);
-            renderer.draw();
-        }
+    function moveStationHere(index: number) {
+        renderer.removeStationFromLine(currentLine.id, movedStationId);
+        renderer.insertStationToLine(currentLine.id, movedStationId, index);
         renderer.draw();
+        cancelMoveStation();
+    }
+    function cancelMoveStation() {
+        movedStationEl.style.opacity = "1";
+        movedStationId = undefined;
+        movedStationEl = undefined;
     }
 
     // TRAINS
@@ -193,24 +191,36 @@
                             {renderer.stations[stationId].name}
                         </p>
                         <span>
-                            <i
-                                class="fas fa-chevron-down"
-                                on:click={() => {
-                                    moveStationDown(stationId);
-                                }}
-                            />
-                            <i
-                                class="ml-2 fas fa-chevron-up"
-                                on:click={() => {
-                                    moveStationUp(stationId);
-                                }}
-                            />
-                            <i
-                                class="ml-2 fas fa-times"
-                                on:click={() => {
-                                    removeStation(stationId);
-                                }}
-                            />
+                            {#if movedStationId != undefined}
+                                {#if movedStationId == stationId}
+                                    <i
+                                        class="fas fa-times cursor-pointer"
+                                        on:click={() => cancelMoveStation()}
+                                    />
+                                {:else}
+                                    <i
+                                        class="fas fa-check cursor-pointer"
+                                        on:click={() => moveStationHere(i)}
+                                    />
+                                {/if}
+                            {:else}
+                                <i
+                                    class="fas fa-arrows-alt-v cursor-pointer"
+                                    on:click={(e) => {
+                                        moveStation(
+                                            e.currentTarget.parentElement
+                                                .parentElement,
+                                            stationId,
+                                        );
+                                    }}
+                                />
+                                <i
+                                    class="ml-2 fas fa-times cursor-pointer"
+                                    on:click={() => {
+                                        removeStation(stationId);
+                                    }}
+                                />
+                            {/if}
                         </span>
                     </li>
                 {/each}

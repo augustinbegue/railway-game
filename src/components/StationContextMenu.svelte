@@ -62,6 +62,9 @@
 
         renderer.draw();
     }
+    function deleteLink(from: number, to: number) {
+        renderer.deleteLink(from, to);
+    }
 
     // Line Management
     let addToLineToggle = false;
@@ -195,6 +198,13 @@
                                         decreaseTrackNumber(i, station.id)}
                                 >
                                     <i class="fas fa-minus" />
+                                </button>
+
+                                <button
+                                    class="p-1 bg-dark-200 rounded leading-none hover:bg-dark-400 transition-all"
+                                    on:click={(ev) => deleteLink(i, station.id)}
+                                >
+                                    <i class="fas fa-times" />
                                 </button>
                             </span>
                         </div>
