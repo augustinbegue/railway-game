@@ -34,6 +34,8 @@ export class GameRenderer {
     lines: Line[] = [];
     trains: Train[] = [];
 
+    private readonly overcrowdedColor = "#f54242";
+
     constructor(map: GameMap, gameData: GameData, stations: Station[], lines: Line[], trains: Train[]) {
         this.map = map;
         this.gameData = gameData;
@@ -291,6 +293,11 @@ export class GameRenderer {
             link.drawn = false;
             return link;
         })));
+        Storage.save(Storage.keys.STATIONS, this.stations.map(station => {
+            station.circle = null;
+            station.text = null;
+            return station;
+        }));
         this.draw();
     }
 
@@ -402,6 +409,7 @@ export class GameRenderer {
                 }
             }
         }
+        this.draw();
 
         // Update Trains on each line
         for (let i = 0; i < this.lines.length; i++) {
@@ -460,6 +468,8 @@ export class GameRenderer {
                 if (track) {
                     let point = track.getPointAt(train.location.trackIsForward ? (train.location.percent / 100) : 1 - (train.location.percent / 100), null);
                     train.element = this.two.makeCircle(point.x, point.y, 1, 1);
+                    if (train.passengers.length > train.info.capacity)
+                        train.element.fill = this.overcrowdedColor;
                     train.location.position = { x: point.x, y: point.y };
                 }
 
@@ -553,6 +563,9 @@ export class GameRenderer {
         let currentStation = this.stations[currentStationId];
 
         for (let i = 0; i < currentStation.waitingPassengers.length; i++) {
+            if (train.passengers.length > train.info.capacity)
+                break;
+
             const p = currentStation.waitingPassengers[i];
             // A passenger can board if:
             // - The next station on the itinerary is the same as the next station of the train
@@ -618,8 +631,14 @@ export class GameRenderer {
         ) as any;
 
         station.circle.fill = fill;
-        station.circle.clip = false;
-        station.circle.noStroke();
+
+        // Overcrowded station indication
+        if (station.waitingPassengers.length > station.waitingPassengersMax) {
+            station.circle.stroke = this.overcrowdedColor;
+            station.circle.linewidth = 4;
+        }
+        else
+            station.circle.noStroke();
 
         if (station.text) {
             station.text.remove();

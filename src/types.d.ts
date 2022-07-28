@@ -1,4 +1,6 @@
 import type Two from "src/two";
+import type { Circle } from "two.js/src/shapes/circle";
+import type { Text } from "two.js/src/text";
 
 export interface GameData {
     time: {
@@ -47,8 +49,8 @@ export interface Station {
     lineIds: number[];
     linkedTo: number[];
     size: number;
-    circle?: any;
-    text?: any;
+    circle?: Circle;
+    text?: Text;
     spawned: boolean;
     // Passengers in the station
     waitingPassengers: Passenger[];
