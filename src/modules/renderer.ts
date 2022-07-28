@@ -1,4 +1,5 @@
 import Two from "two.js";
+import type { Stop } from "two.js/src/effects/stop";
 import type { Path } from "two.js/src/path";
 import type { Line as TwoLine } from "two.js/src/shapes/line";
 import type { GameMap, GameData, Line, Link, Station, Train, Passenger } from "../types";
@@ -384,6 +385,7 @@ export class GameRenderer {
 
             if (station.spawned) {
                 if (station.nextPassengerArrival <= 0) {
+                    let prevStationCount = station.waitingPassengers.length;
                     let availableStations = spawnedStations.filter(s => s.id !== station.id);
                     let destinationStation = availableStations[Math.floor(Math.random() * (availableStations.length - 1))];
 
@@ -403,14 +405,15 @@ export class GameRenderer {
                         };
 
                         station.waitingPassengers = [...station.waitingPassengers, passenger];
+
+                        // Redraw the station if it became overcrowded or not overcrowded
+                        this.checkStationForRedraw(prevStationCount, station);
                     }
                 } else {
                     station.nextPassengerArrival -= elapsedTime;
                 }
             }
         }
-        this.draw();
-
         // Update Trains on each line
         for (let i = 0; i < this.lines.length; i++) {
             const line = this.lines[i];
@@ -489,6 +492,7 @@ export class GameRenderer {
                     // Get the next station
                     train.location.percent = 0;
                     let currentStationId = line.stationIds[train.location.stationIndex];
+                    let currentStation = this.stations[currentStationId];
                     train.location.stationIndex = train.location.reverseTrip ? train.location.stationIndex - 1 : train.location.stationIndex + 1;
 
                     // Turn back if reached end of line
@@ -510,13 +514,24 @@ export class GameRenderer {
                     train.location.stopped = true;
                     train.location.stoppedTime = this.gameData.time.seconds;
 
+                    let prevPassengerCount = currentStation.waitingPassengers.length;
                     // Check if passengers need to disembark
                     this.disembarkPassengersFromTrain(train, currentStationId, newStationId);
 
                     // Check if passengers need to board
                     this.boardPassengersToTrain(train, currentStationId, newStationId);
+
+                    // Check if the station needs to be redrawn
+                    this.checkStationForRedraw(prevPassengerCount, currentStation);
                 }
             }
+        }
+    }
+
+    private checkStationForRedraw(prevStationCount: number, station: Station) {
+        if (prevStationCount < station.waitingPassengersMax && station.waitingPassengers.length >= station.waitingPassengersMax
+            || prevStationCount >= station.waitingPassengersMax && station.waitingPassengers.length < station.waitingPassengersMax) {
+            this.drawStation(station);
         }
     }
 
@@ -616,8 +631,6 @@ export class GameRenderer {
     }
 
     private drawStation(station: Station, fill = "#8f9ebf") {
-        // TODO: Implement station colors
-
         if (!station.spawned)
             return;
 
@@ -634,11 +647,28 @@ export class GameRenderer {
 
         // Overcrowded station indication
         if (station.waitingPassengers.length > station.waitingPassengersMax) {
-            station.circle.stroke = this.overcrowdedColor;
-            station.circle.linewidth = 4;
+            station.circle.fill = this.overcrowdedColor;
         }
-        else
-            station.circle.noStroke();
+
+        // Station lines
+        let gradientStops: Stop[] = [];
+        for (let i = 0; i < station.lineIds.length; i++) {
+            const id = station.lineIds[i];
+            const line = this.lines[id];
+            console.log(i / station.lineIds.length, line.color);
+            gradientStops.push(new Two.Stop(i / station.lineIds.length, line.color));
+            console.log((i + 1) / station.lineIds.length, line.color);
+            gradientStops.push(new Two.Stop((i + 1) / station.lineIds.length, line.color));
+        }
+
+        station.circle.stroke = this.two.makeLinearGradient(
+            0,
+            0,
+            1,
+            1,
+            ...gradientStops
+        );
+        station.circle.linewidth = 5;
 
         if (station.text) {
             station.text.remove();
