@@ -29,8 +29,6 @@ export class Line extends GameObject implements ILine {
         this.hidden = line.hidden;
         this.trains = [];
         this.trainSchedule = JSON.parse(JSON.stringify(line.trainSchedule));
-
-        this.store = writable(this);
     }
 
     /**
@@ -101,6 +99,7 @@ export class Line extends GameObject implements ILine {
 
         // Insert the station in the line
         this.stationIds.splice(index, 0, station.id);
+        station.lineIds = [...station.lineIds, this.id];
 
         // Create the links between the stations
         const prevStation = index - 1 >= 0 ? renderer.stations.find(station => station.id === this.stationIds[index - 1]) : null;

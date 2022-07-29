@@ -4,7 +4,7 @@ import type { GameRenderer } from "./GameRenderer";
 import { Storage } from "./Storage";
 import trainsJSON from "../data/trains/rer.json";
 import type { Line } from "./Line";
-import { lines } from "../stores";
+import { gameData, lines } from "../stores";
 
 export class Train implements ITrain {
     id: number;
@@ -39,25 +39,34 @@ export class Train implements ITrain {
         const currentStation = renderer.stations[currentStationId];
         const newStation = renderer.stations[line.stationIds[this.location.stationIndex]];
 
-        for (let i = 0; i < this.passengers.length; i++) {
-            const p = this.passengers[i];
+        gameData.update(data => {
+            let passengerServed = 0;
+            for (let i = 0; i < this.passengers.length; i++) {
+                const p = this.passengers[i];
 
-            // A Passenger needs to disembark if:
-            // - It is at the end of its itinerary
-            // - The next station on the itinerary is not the same as the next station of the train
-            let currentStationItineraryIndex = p.itinerary.indexOf(currentStationId);
-            if ((p.itinerary.length - 1 === currentStationItineraryIndex) || (p.itinerary[currentStationItineraryIndex + 1] !== newStation.id)) {
-                // Disembark the passenger
-                this.passengers.splice(i, 1);
-                i--;
+                // A Passenger needs to disembark if:
+                // - It is at the end of its itinerary
+                // - The next station on the itinerary is not the same as the next station of the train
+                let currentStationItineraryIndex = p.itinerary.indexOf(currentStationId);
+                if ((p.itinerary.length - 1 === currentStationItineraryIndex) || (p.itinerary[currentStationItineraryIndex + 1] !== newStation.id)) {
+                    // Disembark the passenger
+                    this.passengers.splice(i, 1);
+                    i--;
 
-                // If the passenger is at the end of its itinerary, don't add it to the station waiting list
-                if (p.itinerary.length - 1 != currentStationItineraryIndex)
-                    currentStation.waitingPassengers.push(p);
-                else
-                    renderer.gameData.stats.passengersServed = renderer.gameData.stats.passengersServed + 1;
+                    // If the passenger is at the end of its itinerary, don't add it to the station waiting list
+                    if (p.itinerary.length - 1 != currentStationItineraryIndex)
+                        currentStation.waitingPassengers.push(p);
+                    else
+                        passengerServed++;
+                }
             }
-        }
+
+            if (passengerServed > 0) {
+                data.stats.passengersServed += passengerServed;
+            }
+
+            return data;
+        });
     }
 
     boardPassengers(renderer: GameRenderer, line: Line, currentStationId: number) {
@@ -82,7 +91,9 @@ export class Train implements ITrain {
     }
 
     copy() {
-        return new Train(this.id, this);
+        let t = new Train(this.id, this);
+        t.passengers = JSON.parse(JSON.stringify(this.passengers));
+        return t;
     }
 
     static types: ITrain[] = [];

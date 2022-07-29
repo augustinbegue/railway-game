@@ -101,7 +101,7 @@
         // Stores
         lines.subscribe((lines) => {
             if (currentLineId != -1) {
-                currentLine = lines[currentLineId];
+                currentLine = lines[currentLineId].copy();
             }
         });
     });
@@ -234,7 +234,7 @@
                 </p>
                 <p>
                     Train last departed {Math.round(
-                        (renderer.gameData.time.seconds -
+                        (renderer._gameData.time.seconds -
                             currentLine.trainSchedule.previousDepartureTime) /
                             60,
                     )}min ago

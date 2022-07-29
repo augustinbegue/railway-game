@@ -19,6 +19,7 @@
     import StatsDisplayComponent from "./components/StatsDisplayComponent.svelte";
     import { Train } from "./modules/Train";
     import { Line } from "./modules/Line";
+    import { gameData } from "./stores";
 
     let map: GameMap = {
         startLat: "49.467176211864015",
@@ -56,27 +57,8 @@
 
     Line.initLines();
     Train.initTypes();
-
-    let gameData: GameData = Storage.exists(Storage.keys.GAMEDATA)
-        ? Storage.get(Storage.keys.GAMEDATA)
-        : {
-              time: {
-                  multiplicator: 1,
-                  seconds: 12 * 60 * 60,
-                  nextStationSpawn: 0,
-              },
-              stats: {
-                  passengersCreated: 0,
-                  passengersServed: 0,
-              },
-              settings: {
-                  stationStartNumber: 3,
-                  stationSpawnTime: 600,
-                  stationSpawnTimeVariation: 120,
-                  passengerArrivalInterval: 60,
-                  passengerArrivalIntervalVariation: 30,
-              },
-          };
+    if (Storage.exists(Storage.keys.GAMEDATA))
+        gameData.set(Storage.get(Storage.keys.GAMEDATA));
 
     // Drawing constants
     let renderer: GameRenderer;
@@ -89,7 +71,7 @@
     let minscale = 0.1;
 
     onMount(() => {
-        renderer = new GameRenderer(map, gameData, stations);
+        renderer = new GameRenderer(map, stations);
 
         document.body.onwheel = (e) => {
             const amount = e.deltaY < 0 ? -0.1 : 0.1;
@@ -191,8 +173,8 @@
 
 {#if renderer}
     <div class="absolute right-0 z-20">
-        <TimeDisplayComponent {renderer} />
-        <StatsDisplayComponent {renderer} />
+        <TimeDisplayComponent />
+        <StatsDisplayComponent />
     </div>
     <div class="h-full w-full absolute z-10">
         <IconBarMenus {renderer} />

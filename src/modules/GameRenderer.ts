@@ -3,7 +3,7 @@ import Two from "two.js";
 import type { Stop } from "two.js/src/effects/stop";
 import type { Path } from "two.js/src/path";
 import type { Line as TwoLine } from "two.js/src/shapes/line";
-import { lines } from "../stores";
+import { gameData, lines } from "../stores";
 import type { GameMap, GameData, ILine, ILink, Station, ITrain, IPassenger } from "../types";
 import type { Line } from "./Line";
 import { Storage } from "./Storage";
@@ -11,24 +11,7 @@ import { Storage } from "./Storage";
 export class GameRenderer {
     two: Two;
 
-    gameData: GameData = {
-        time: {
-            multiplicator: 1,
-            seconds: 12 * 60 * 60,
-            nextStationSpawn: 0,
-        },
-        stats: {
-            passengersCreated: 0,
-            passengersServed: 0,
-        },
-        settings: {
-            stationStartNumber: 3,
-            stationSpawnTime: 600,
-            stationSpawnTimeVariation: 120,
-            passengerArrivalInterval: 60,
-            passengerArrivalIntervalVariation: 30,
-        }
-    };
+    private _gameData: GameData;
 
     map: GameMap;
     stations: Station[];
@@ -38,9 +21,8 @@ export class GameRenderer {
 
     private readonly overcrowdedColor = "#f54242";
 
-    constructor(map: GameMap, gameData: GameData, stations: Station[]) {
+    constructor(map: GameMap, stations: Station[]) {
         this.map = map;
-        this.gameData = gameData;
         this.stations = stations;
 
         this.two = new Two({
@@ -111,6 +93,13 @@ export class GameRenderer {
             if (this.lines.length > 0)
                 this.draw();
         });
+
+        gameData.subscribe(gameData => {
+            console.log("GameRenderer: gameData updated", gameData);
+
+            this._gameData = gameData;
+            Storage.save(Storage.keys.GAMEDATA, gameData);
+        });
     }
 
     /**
@@ -164,8 +153,6 @@ export class GameRenderer {
      * Updates the screen
      */
     draw() {
-        Storage.save(Storage.keys.GAMEDATA, this.gameData);
-
         // Reset scene drawing states
         this.two.clear();
         for (let i = 0; i < this.links.length; i++) {
@@ -213,17 +200,17 @@ export class GameRenderer {
 
     update(frameCount: number, timeDelta: number) {
         // Updating GameTime
-        let elapsedTime = (timeDelta / 1000) * this.gameData.time.multiplicator;
-        this.gameData.time.seconds += (timeDelta / 1000) * this.gameData.time.multiplicator;
+        let elapsedTime = (timeDelta / 1000) * this._gameData.time.multiplicator;
+        this._gameData.time.seconds += (timeDelta / 1000) * this._gameData.time.multiplicator;
 
         // Update stations spawn time
-        if (this.gameData.time.nextStationSpawn <= 0) {
-            this.gameData.time.nextStationSpawn = this.gameData.settings.stationSpawnTime + Math.random() * this.gameData.settings.stationSpawnTimeVariation;
+        if (this._gameData.time.nextStationSpawn <= 0) {
+            this._gameData.time.nextStationSpawn = this._gameData.settings.stationSpawnTime + Math.random() * this._gameData.settings.stationSpawnTimeVariation;
             let i = 0
             for (; i < this.stations.length && this.stations[i].spawned; i++) { }
 
-            if (i < this.gameData.settings.stationStartNumber - 1)
-                this.gameData.time.nextStationSpawn = 0;
+            if (i < this._gameData.settings.stationStartNumber - 1)
+                this._gameData.time.nextStationSpawn = 0;
             if (i < this.stations.length) {
                 // Spawn station and set its initial values
                 this.stations[i].spawned = true;
@@ -231,12 +218,12 @@ export class GameRenderer {
                 this.stations[i].waitingPassengers = [];
                 this.stations[i].waitingPassengersMax = 100;
                 this.stations[i].passengersArrivalRate = 1;
-                this.stations[i].nextPassengerArrival = this.gameData.settings.passengerArrivalInterval + Math.random() * this.gameData.settings.passengerArrivalIntervalVariation;
+                this.stations[i].nextPassengerArrival = this._gameData.settings.passengerArrivalInterval + Math.random() * this._gameData.settings.passengerArrivalIntervalVariation;
 
-                this.draw(lines);
+                this.draw();
             }
         } else {
-            this.gameData.time.nextStationSpawn -= elapsedTime;
+            this._gameData.time.nextStationSpawn -= elapsedTime;
         }
         let spawnedStations = this.stations.filter(s => s.spawned);
 
@@ -251,16 +238,16 @@ export class GameRenderer {
                     let destinationStation = availableStations[Math.floor(Math.random() * (availableStations.length - 1))];
 
                     if (destinationStation) {
-                        station.nextPassengerArrival = (this.gameData.settings.passengerArrivalInterval + Math.random() * this.gameData.settings.passengerArrivalIntervalVariation) / station.passengersArrivalRate;
+                        station.nextPassengerArrival = (this._gameData.settings.passengerArrivalInterval + Math.random() * this._gameData.settings.passengerArrivalIntervalVariation) / station.passengersArrivalRate;
 
                         let passenger: IPassenger =
                         {
-                            id: this.gameData.stats.passengersCreated++,
-                            name: "Passenger " + this.gameData.stats.passengersCreated,
+                            id: this._gameData.stats.passengersCreated++,
+                            name: "Passenger " + this._gameData.stats.passengersCreated,
                             startStationId: station.id,
                             endStationId: destinationStation.id,
                             itinerary: this.findPath(station.id, destinationStation.id),
-                            startTime: this.gameData.time.seconds,
+                            startTime: this._gameData.time.seconds,
                             endTime: 0,
                             waiting: true,
                         };
@@ -288,7 +275,7 @@ export class GameRenderer {
 
                 if (train.location.stopped) {
                     // Check if train stopping time is over
-                    if (this.gameData.time.seconds - train.location.stoppedTime >= line.trainSchedule.stoppingTimeSeconds) {
+                    if (this._gameData.time.seconds - train.location.stoppedTime >= line.trainSchedule.stoppingTimeSeconds) {
                         train.location.stopped = false;
                         let newStationId = line.stationIds[train.location.stationIndex];
                     } else
@@ -302,9 +289,9 @@ export class GameRenderer {
 
                 // Train is not moving and we can start it => start its schedule
                 if (!train.location.currentLink) {
-                    if (this.gameData.time.seconds - line.trainSchedule.previousDepartureTime > line.trainSchedule.intervalSeconds) {
+                    if (this._gameData.time.seconds - line.trainSchedule.previousDepartureTime > line.trainSchedule.intervalSeconds) {
                         train.location.stationIndex = 1;
-                        line.trainSchedule.previousDepartureTime = this.gameData.time.seconds;
+                        line.trainSchedule.previousDepartureTime = this._gameData.time.seconds;
                         train.location.currentLink = this.links[line.stationIds[0]].find(l => l.to === line.stationIds[1]);
 
                         // Check if passengers need to board
@@ -344,7 +331,7 @@ export class GameRenderer {
                 let meters = Math.sqrt(Math.pow(stationFrom.position.x - stationTo.position.x, 2) + Math.pow(stationFrom.position.y - stationTo.position.y, 2));
 
                 let metersByMillisecond = train.info.maxSpeed * 1000 / 360000;
-                let distanceTraveled = metersByMillisecond * timeDelta * this.gameData.time.multiplicator;
+                let distanceTraveled = metersByMillisecond * timeDelta * this._gameData.time.multiplicator;
                 let distancePercent = distanceTraveled / meters;
 
                 train.location.percent = train.location.percent + distancePercent;
@@ -374,7 +361,7 @@ export class GameRenderer {
 
                     // Pause the train for its stopping time
                     train.location.stopped = true;
-                    train.location.stoppedTime = this.gameData.time.seconds;
+                    train.location.stoppedTime = this._gameData.time.seconds;
 
                     let prevPassengerCount = currentStation.waitingPassengers.length;
                     // Check if passengers need to disembark
