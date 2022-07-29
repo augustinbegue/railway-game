@@ -1,6 +1,16 @@
 import type { Writable } from "svelte/store";
+import { gameData } from "../stores";
+import type { GameData } from "../types";
 
 export class GameObject {
+    protected _gameData: GameData;
+
+    constructor() {
+        gameData.subscribe((data: GameData) => {
+            this._gameData = data;
+        });
+    }
+
     /**
      * @returns Copy of the GameObject
      */

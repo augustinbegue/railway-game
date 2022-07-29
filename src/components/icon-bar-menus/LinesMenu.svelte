@@ -5,7 +5,7 @@
     import type { ILine, ITrain } from "../../types";
     import { Train } from "../../modules/Train";
     import { Line } from "../../modules/Line";
-    import { lines } from "../../stores";
+    import { gameData, lines } from "../../stores";
 
     export let renderer: GameRenderer;
     function toggleLine(el: HTMLElement, lineIndex: number) {
@@ -234,13 +234,14 @@
                 </p>
                 <p>
                     Train last departed {Math.round(
-                        (renderer._gameData.time.seconds -
+                        ($gameData.time.seconds -
                             currentLine.trainSchedule.previousDepartureTime) /
                             60,
                     )}min ago
                 </p>
             </div>
             <ul class="trains-list">
+                <!-- TODO: Improve this display -->
                 {#each currentLine.trains as train}
                     <li>
                         {train.info.name}#{train.id}
@@ -278,10 +279,12 @@
                             {:else}
                                 Terminus: {renderer.stations[
                                     currentLine.stationIds[
-                                        train.location.stationIndex - 1
+                                        train.location.stationIndex
                                     ]
                                 ]?.name}
                             {/if}
+                        {:else}
+                            | Waiting for the next departure
                         {/if}
                     </li>
                 {/each}

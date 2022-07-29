@@ -11,7 +11,7 @@ import { Storage } from "./Storage";
 export class GameRenderer {
     two: Two;
 
-    private _gameData: GameData;
+    _gameData: GameData;
 
     map: GameMap;
     stations: Station[];
@@ -19,7 +19,7 @@ export class GameRenderer {
     tracks: TwoLine[][][] = [];
     lines: Line[] = [];
 
-    private readonly overcrowdedColor = "#f54242";
+    readonly overcrowdedColor = "#f54242";
 
     constructor(map: GameMap, stations: Station[]) {
         this.map = map;
@@ -95,8 +95,6 @@ export class GameRenderer {
         });
 
         gameData.subscribe(gameData => {
-            console.log("GameRenderer: gameData updated", gameData);
-
             this._gameData = gameData;
             Storage.save(Storage.keys.GAMEDATA, gameData);
         });
@@ -271,113 +269,15 @@ export class GameRenderer {
                 continue;
 
             for (let i = 0; i < line.trains.length; i++) {
-                const train = line.trains[i];
-
-                if (train.location.stopped) {
-                    // Check if train stopping time is over
-                    if (this._gameData.time.seconds - train.location.stoppedTime >= line.trainSchedule.stoppingTimeSeconds) {
-                        train.location.stopped = false;
-                        let newStationId = line.stationIds[train.location.stationIndex];
-                    } else
-                        continue;
-                }
-
-                // Train Animation
-                if (!this.tracks) {
-                    return;
-                }
-
-                // Train is not moving and we can start it => start its schedule
-                if (!train.location.currentLink) {
-                    if (this._gameData.time.seconds - line.trainSchedule.previousDepartureTime > line.trainSchedule.intervalSeconds) {
-                        train.location.stationIndex = 1;
-                        line.trainSchedule.previousDepartureTime = this._gameData.time.seconds;
-                        train.location.currentLink = this.links[line.stationIds[0]].find(l => l.to === line.stationIds[1]);
-
-                        // Check if passengers need to board
-                        train.boardPassengers(this, line, line.stationIds[0]);
-                    } else {
-                        continue;
-                    }
-                }
-
-                let track: Path;
-                // Get first track of link and its direction
-                if (!track) {
-                    train.location.trackIsForward = true;
-                    let tracks = this.tracks[train.location.currentLink.from][train.location.currentLink.to];
-                    if (tracks.length === 0) {
-                        train.location.trackIsForward = false;
-                        tracks = this.tracks[train.location.currentLink.to][train.location.currentLink.from];
-                    }
-
-                    if (tracks.length !== 0) {
-                        track = train.location.trackIsForward ? tracks[tracks.length - 1] : tracks[0];
-                    }
-                }
-
-                train.element?.remove();
-                if (track) {
-                    let point = track.getPointAt(train.location.trackIsForward ? (train.location.percent / 100) : 1 - (train.location.percent / 100), null);
-                    train.element = this.two.makeCircle(point.x, point.y, 1, 1);
-                    if (train.passengers.length > train.info.capacity)
-                        train.element.fill = this.overcrowdedColor;
-                    train.location.position = { x: point.x, y: point.y };
-                }
-
-                let stationFrom = this.stations[train.location.currentLink.from];
-                let stationTo = this.stations[train.location.currentLink.to];
-
-                let meters = Math.sqrt(Math.pow(stationFrom.position.x - stationTo.position.x, 2) + Math.pow(stationFrom.position.y - stationTo.position.y, 2));
-
-                let metersByMillisecond = train.info.maxSpeed * 1000 / 360000;
-                let distanceTraveled = metersByMillisecond * timeDelta * this._gameData.time.multiplicator;
-                let distancePercent = distanceTraveled / meters;
-
-                train.location.percent = train.location.percent + distancePercent;
-
-                // Train Reached Station
-                if (train.location.percent > 100) {
-                    // Get the next station
-                    train.location.percent = 0;
-                    let currentStationId = line.stationIds[train.location.stationIndex];
-                    let currentStation = this.stations[currentStationId];
-                    train.location.stationIndex = train.location.reverseTrip ? train.location.stationIndex - 1 : train.location.stationIndex + 1;
-
-                    // Turn back if reached end of line
-                    if (train.location.stationIndex >= line.stationIds.length) {
-                        train.location.reverseTrip = true;
-                        train.location.stationIndex -= 2;
-                    } else if (train.location.stationIndex < 0) {
-                        train.location.reverseTrip = false;
-                        train.location.stationIndex = 0;
-                    }
-
-                    let newStationId = line.stationIds[train.location.stationIndex];
-
-                    // Get the next link
-                    train.location.currentLink = this.links[currentStationId].find(l => l.to === newStationId);
-                    track = undefined;
-
-                    // Pause the train for its stopping time
-                    train.location.stopped = true;
-                    train.location.stoppedTime = this._gameData.time.seconds;
-
-                    let prevPassengerCount = currentStation.waitingPassengers.length;
-                    // Check if passengers need to disembark
-                    train.disembarkPassengers(this, line, currentStationId);
-
-                    // Check if passengers need to board
-                    train.boardPassengers(this, line, currentStationId);
-
-                    // Check if the station needs to be redrawn
-                    this.checkStationForRedraw(prevPassengerCount, currentStation);
-                }
+                this._gameData.stats.passengersServed += line.trains[i].update(this, line, timeDelta);
             }
         }
+
+
+        gameData.set(this._gameData);
     }
 
-    private checkStationForRedraw(prevStationCount: number, station: Station) {
+    checkStationForRedraw(prevStationCount: number, station: Station) {
         if (prevStationCount < station.waitingPassengersMax && station.waitingPassengers.length >= station.waitingPassengersMax
             || prevStationCount >= station.waitingPassengersMax && station.waitingPassengers.length < station.waitingPassengersMax) {
             this.drawStation(station);
