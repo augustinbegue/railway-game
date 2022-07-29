@@ -39,8 +39,8 @@ export class Line extends GameObject implements ILine {
         this.stationIds = [...this.stationIds, stationId];
         station.lineIds = [...station.lineIds, this.id];
 
-        // Update the store
         lines.update(lines => { lines[this.id] = this; return lines; });
+        GameStorage.saveDynamic();
 
         renderer.updatePassengersItineraries([station.id]);
     }
@@ -55,8 +55,8 @@ export class Line extends GameObject implements ILine {
         this.stationIds = this.stationIds.filter(id => id !== stationId);
         station.lineIds = station.lineIds.filter(lineId => lineId !== this.id);
 
-        // Update the store
         lines.update(lines => { lines[this.id] = this; return lines; });
+        GameStorage.saveDynamic();
 
         renderer.updatePassengersItineraries([station.id]);
     }
@@ -84,8 +84,9 @@ export class Line extends GameObject implements ILine {
             renderer.createLink(station, nextStation);
         }
 
-        // Update the store
         lines.update(lines => { lines[this.id] = this; return lines; });
+        GameStorage.saveDynamic();
+
         renderer.updatePassengersItineraries([station.id]);
     }
 

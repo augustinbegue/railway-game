@@ -40,12 +40,14 @@ export class GameStorage {
                 break;
             case GameStorage.keys.LINES:
                 value = (value as Line[]).map((line: Line) => { return line.toJSON(); });
+                break;
             case GameStorage.keys.STATIONS:
                 value = (value as Station[]).map((station: Station) => {
                     station.circle = null;
                     station.text = null;
                     return station;
                 });
+                break;
             default:
                 break;
         }
