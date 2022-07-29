@@ -1,9 +1,11 @@
 <script lang="ts">
     import { each } from "svelte/internal";
-    import type { GameRenderer } from "../modules/renderer";
-    import { Storage } from "../modules/storage";
+    import type { GameRenderer } from "../modules/GameRenderer";
+    import { Line } from "../modules/Line";
+    import { Storage } from "../modules/Storage";
+    import { lines } from "../stores";
 
-    import type { Line, Station } from "../types";
+    import type { ILine, Station } from "../types";
 
     export let renderer: GameRenderer;
     export let station: Station;
@@ -60,7 +62,7 @@
         link1.drawn = false;
         link2.drawn = false;
 
-        renderer.draw();
+        renderer.draw($lines);
     }
     function deleteLink(from: number, to: number) {
         renderer.deleteLink(from, to);
@@ -69,23 +71,15 @@
     // Line Management
     let addToLineToggle = false;
     let addToLineSelect: HTMLSelectElement;
-    $: linesNotInStation = renderer.lines?.filter(
+    $: linesNotInStation = $lines.filter(
         (l) => !l.stationIds.includes(station?.id),
     );
     function addToLineClicked(e: MouseEvent) {
         addToLineToggle = !addToLineToggle;
-        if (addToLineToggle) {
-            linesNotInStation = renderer.lines.filter(
-                (l) => !l.stationIds.includes(station.id),
-            );
-        }
     }
     function addToLine() {
         let id = addToLineSelect.value;
-        renderer.addStationToLine(parseInt(id), station.id);
-        linesNotInStation = renderer.lines.filter(
-            (l) => !l.stationIds.includes(station.id),
-        );
+        $lines[parseInt(id)]?.addStation(renderer, station.id);
     }
 
     // Passengers Information
@@ -175,13 +169,13 @@
                                     class="bg-dark-100 p-1 w-8"
                                     type="text"
                                     value={renderer.links[i].find(
-                                        (l) => l.to === parseInt(station.id),
+                                        (l) => l.to === station.id,
                                     ).tracks}
                                     on:change={(e) =>
                                         setTrackNumber(
                                             i,
                                             station.id,
-                                            e.target.value,
+                                            e.currentTarget.valueAsNumber,
                                         )}
                                 />
                                 <button
@@ -221,11 +215,10 @@
                         <div class="inline-flex flex-row items-center pl-2">
                             <span
                                 class="p-3 rounded-lg"
-                                style="background-color: {renderer.lines[i]
-                                    .color};"
+                                style="background-color: {$lines[i].color};"
                             />
                             <span class="subsubtitle pl-2">
-                                {renderer.lines[i].name}
+                                {$lines[i].name}
                             </span>
                         </div>
                     {/each}

@@ -1,15 +1,16 @@
 <script lang="ts">
     import { onMount } from "svelte";
 
-    import type { GameRenderer } from "../../modules/renderer";
-    import { Storage } from "../../modules/storage";
-    import type { Train } from "../../types";
+    import type { GameRenderer } from "../../modules/GameRenderer";
+    import { Storage } from "../../modules/Storage";
+    import { Train } from "../../modules/Train";
+    import type { ITrain } from "../../types";
 
     export let renderer: GameRenderer;
 
     let trainForm: HTMLElement;
     let currentTrainIndex: number;
-    let currentTrain: Train = {
+    let currentTrain: ITrain = {
         id: -1,
         info: {
             name: "",
@@ -39,15 +40,15 @@
     }
     function editTrain(trainIndex) {
         currentTrainIndex = trainIndex;
-        currentTrain = renderer.trains[currentTrainIndex];
+        currentTrain = Train.types[currentTrainIndex];
         trainForm.style.display = null;
     }
     function submitTrainForm() {
         if (currentTrain.info.name.length > 0) {
             if (currentTrainIndex != -1) {
-                renderer.editTrainType(currentTrain);
+                Train.editType(currentTrain);
             } else {
-                renderer.addTrainType(currentTrain);
+                Train.addType(currentTrain);
             }
             renderer.draw();
             cancelTrainForm();
@@ -92,9 +93,9 @@
             <button class="button" on:click={addTrain}>
                 <i class="fas fa-plus" /> New train
             </button>
-            <p class="desc-text">Trains: {renderer.trains.length}</p>
+            <p class="desc-text">Trains: {Train.types.length}</p>
         </div>
-        {#each renderer.trains as train, i}
+        {#each Train.types as train, i}
             <div class="py-2 first:pt-0 last:pb-0 justify-between ">
                 <p>
                     {train.info.name}

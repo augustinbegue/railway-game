@@ -1,23 +1,24 @@
 <script lang="ts">
     import type {
         GameMap,
-        Line,
+        ILine,
         Station,
-        Link,
+        ILink,
         Position,
-        Train,
+        ITrain,
         GameData,
     } from "./types";
     import Two from "two.js";
     import { onMount } from "svelte";
-    import { GameRenderer } from "./modules/renderer";
+    import { GameRenderer } from "./modules/GameRenderer";
     import StationContextMenu from "./components/StationContextMenu.svelte";
     import IconBarMenus from "./components/icon-bar-menus/IconBarMenus.svelte";
     import TimeDisplayComponent from "./components/TimeDisplayComponent.svelte";
     import stationsJSON from "./data/scraping/stations-rer.json";
-    import trainsJSON from "./data/trains/rer.json";
-    import { Storage } from "./modules/storage";
+    import { Storage } from "./modules/Storage";
     import StatsDisplayComponent from "./components/StatsDisplayComponent.svelte";
+    import { Train } from "./modules/Train";
+    import { Line } from "./modules/Line";
 
     let map: GameMap = {
         startLat: "49.467176211864015",
@@ -53,44 +54,8 @@
         }
     }
 
-    let lines: Line[] = Storage.exists(Storage.keys.LINES)
-        ? Storage.get(Storage.keys.LINES)
-        : [];
-
-    let trains: Train[] = Storage.exists(Storage.keys.TRAINS)
-        ? Storage.get(Storage.keys.TRAINS)
-        : [];
-
-    if (trains.length === 0) {
-        for (let i = 0; i < trainsJSON.length; i++) {
-            const t = trainsJSON[i];
-
-            trains.push({
-                id: i,
-                info: {
-                    name: t.info.name,
-                    maxSpeed: parseInt(t.info.maxSpeed),
-                    capacity: parseInt(t.info.capacity),
-                },
-                location: {
-                    running: false,
-                    stopped: false,
-                    stoppedTime: 0,
-                    stationIndex: 0,
-                    currentLink: null,
-                    percent: 0,
-                    trackIsForward: true,
-                    reverseTrip: false,
-                    position: {
-                        x: 0,
-                        y: 0,
-                    },
-                },
-                element: null,
-                passengers: [],
-            });
-        }
-    }
+    Line.initLines();
+    Train.initTypes();
 
     let gameData: GameData = Storage.exists(Storage.keys.GAMEDATA)
         ? Storage.get(Storage.keys.GAMEDATA)
@@ -124,7 +89,7 @@
     let minscale = 0.1;
 
     onMount(() => {
-        renderer = new GameRenderer(map, gameData, stations, lines, trains);
+        renderer = new GameRenderer(map, gameData, stations);
 
         document.body.onwheel = (e) => {
             const amount = e.deltaY < 0 ? -0.1 : 0.1;

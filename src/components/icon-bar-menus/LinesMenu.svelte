@@ -1,8 +1,11 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { InteractiveElements } from "../../modules/interactive-elements";
-    import type { GameRenderer } from "../../modules/renderer";
-    import type { Line, Train } from "../../types";
+    import { InteractiveElements } from "../../modules/InteractiveElements";
+    import type { GameRenderer } from "../../modules/GameRenderer";
+    import type { ILine, ITrain } from "../../types";
+    import { Train } from "../../modules/Train";
+    import { Line } from "../../modules/Line";
+    import { lines } from "../../stores";
 
     export let renderer: GameRenderer;
     function toggleLine(el: HTMLElement, lineIndex: number) {
@@ -11,16 +14,16 @@
         child.classList.toggle("fa-eye");
         child.classList.toggle("fa-eye-slash");
 
-        renderer.lines[lineIndex].hidden = !renderer.lines[lineIndex].hidden;
+        $lines[lineIndex].hidden = !$lines[lineIndex].hidden;
         renderer.draw();
     }
 
     let lineFormElement: HTMLElement;
-    let currentLineId: number;
-    let currentLine: Line = {
+    let currentLineId: number = -1;
+    let defaultLine: ILine = {
         id: -1,
         name: "",
-        color: "",
+        color: "#ffffff",
         hidden: false,
         stationIds: [],
         trains: [],
@@ -30,51 +33,39 @@
             previousDepartureTime: 0,
         },
     };
+    let currentLine: ILine = defaultLine;
     // LINE
     function addLine() {
         lineFormElement.style.display = null;
         currentLineId = -1;
+        currentLine = defaultLine;
     }
     function editLine(el: HTMLElement, lineIndex: number) {
         lineFormElement.style.display = null;
         currentLineId = lineIndex;
-        let line = renderer.lines[currentLineId];
-        currentLine = line;
+        currentLine = $lines[currentLineId].copy();
     }
 
     // FORM SAVE/CANCEL
     function cancelLineForm() {
         lineFormElement.style.display = "none";
-        currentLine = {
-            id: -1,
-            name: "",
-            color: "#ffffff",
-            hidden: false,
-            stationIds: [],
-            trains: [],
-            trainSchedule: {
-                intervalSeconds: 10 * 60,
-                stoppingTimeSeconds: 120,
-                previousDepartureTime: 0,
-            },
-        };
+        currentLine = defaultLine;
+        currentLineId = -1;
     }
     function submitLineForm() {
         if (currentLine.name.length > 0) {
             if (currentLineId != -1) {
-                renderer.editLine(currentLine);
+                Line.editLine(currentLine);
             } else {
-                renderer.addLine(currentLine);
+                Line.addLine(currentLine);
             }
-            renderer.draw();
             cancelLineForm();
         }
     }
 
     // STATIONS
     function removeStation(stationId: number) {
-        renderer.removeStationFromLine(currentLine.id, stationId);
-        renderer.draw();
+        $lines[currentLine.id].removeStation(renderer, stationId);
     }
     let movedStationId: number;
     let movedStationEl: HTMLElement;
@@ -84,9 +75,8 @@
         el.style.opacity = "0.5";
     }
     function moveStationHere(index: number) {
-        renderer.removeStationFromLine(currentLine.id, movedStationId);
-        renderer.insertStationToLine(currentLine.id, movedStationId, index);
-        renderer.draw();
+        $lines[currentLine.id].removeStation(renderer, movedStationId);
+        $lines[currentLine.id].insertStation(renderer, movedStationId, index);
         cancelMoveStation();
     }
     function cancelMoveStation() {
@@ -97,9 +87,8 @@
 
     // TRAINS
     let AddTrainDropdown: HTMLElement;
-    function addTrain(train: Train) {
-        renderer.addTrainToLine(currentLine.id, train.id);
-        renderer.draw();
+    function addTrain(trainId: number) {
+        Train.addToLine(trainId, $lines[currentLine.id]);
         toggleAddTrainDropdown();
     }
 
@@ -108,6 +97,13 @@
         cancelLineForm();
         InteractiveElements.Tabs(lineFormElement);
         toggleAddTrainDropdown = InteractiveElements.Dropdown(AddTrainDropdown);
+
+        // Stores
+        lines.subscribe((lines) => {
+            if (currentLineId != -1) {
+                currentLine = lines[currentLineId];
+            }
+        });
     });
 </script>
 
@@ -117,9 +113,9 @@
             <button class="button" on:click={addLine}>
                 <i class="fas fa-plus" /> New line
             </button>
-            <p class="desc-text">Lines: {renderer.lines.length}</p>
+            <p class="desc-text">Lines: {$lines.length}</p>
         </div>
-        {#each renderer.lines as line, i}
+        {#each $lines as line, i (line.id)}
             <div class="py-2 first:pt-0 last:pb-0 justify-evenly ">
                 <span
                     class="text-sm p-2"
@@ -295,8 +291,8 @@
                     <i class="fas fa-plus" /> Add a train
                 </button>
                 <div>
-                    {#each renderer.trains as train}
-                        <span on:click={() => addTrain(train)}>
+                    {#each Train.types as train}
+                        <span on:click={() => addTrain(train.id)}>
                             <p>
                                 {train.info.name}
                             </p>

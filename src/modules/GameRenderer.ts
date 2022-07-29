@@ -1,10 +1,12 @@
+import { writable, Writable } from "svelte/store";
 import Two from "two.js";
 import type { Stop } from "two.js/src/effects/stop";
 import type { Path } from "two.js/src/path";
 import type { Line as TwoLine } from "two.js/src/shapes/line";
-import type { GameMap, GameData, Line, Link, Station, Train, Passenger } from "../types";
-import { Storage } from "./storage";
-
+import { lines } from "../stores";
+import type { GameMap, GameData, ILine, ILink, Station, ITrain, IPassenger } from "../types";
+import type { Line } from "./Line";
+import { Storage } from "./Storage";
 
 export class GameRenderer {
     two: Two;
@@ -30,19 +32,16 @@ export class GameRenderer {
 
     map: GameMap;
     stations: Station[];
-    links: Link[][] = [];
+    links: ILink[][] = [];
     tracks: TwoLine[][][] = [];
     lines: Line[] = [];
-    trains: Train[] = [];
 
     private readonly overcrowdedColor = "#f54242";
 
-    constructor(map: GameMap, gameData: GameData, stations: Station[], lines: Line[], trains: Train[]) {
+    constructor(map: GameMap, gameData: GameData, stations: Station[]) {
         this.map = map;
         this.gameData = gameData;
         this.stations = stations;
-        this.lines = lines;
-        this.trains = trains;
 
         this.two = new Two({
             fullscreen: true,
@@ -88,7 +87,7 @@ export class GameRenderer {
 
             // Build the adjacency matrix of links between the stations
             for (let j = 0; j < station.linkedTo.length; j++) {
-                let link: Link = {
+                let link: ILink = {
                     from: i,
                     to: station.linkedTo[j],
                     tracks: tracks,
@@ -105,158 +104,13 @@ export class GameRenderer {
         this.two.scene.translation.x = -(this.stations[0].position.x);
         this.two.scene.translation.y = -(this.stations[0].position.y);
 
-        this.draw();
-    }
+        lines.subscribe(lines => {
+            console.log("GameRenderer: lines updated", lines);
 
-    // Add a new train type
-    addTrainType(train: Train): Train {
-        train.id = this.trains.length;
-        this.trains.push(train);
-        Storage.save(Storage.keys.TRAINS, this.trains);
-
-        return train;
-    }
-
-    // Edit a train type
-    editTrainType(train: Train) {
-        let index = this.trains.findIndex(t => t.id === train.id);
-        this.trains[index] = train;
-        Storage.save(Storage.keys.TRAINS, this.trains);
-
-        return train;
-    }
-
-    // Add a new line
-    addLine(line: Line): Line {
-        line.id = this.lines.length;
-        this.lines.push(line);
-        Storage.save(Storage.keys.LINES, this.lines);
-
-        return line;
-    }
-
-    // Edit a line
-    editLine(line: Line) {
-        let index = this.lines.findIndex(l => l.id === line.id);
-        this.lines[index] = line;
-        Storage.save(Storage.keys.LINES, this.lines);
-
-        return line;
-    }
-
-    // Add a train to a line
-    addTrainToLine(lineId: number, trainId: number) {
-        // Ensure nothing is passed as a reference
-        let newTrain = JSON.parse(JSON.stringify(this.trains[trainId]));
-        newTrain.id = this.lines[lineId].trains.length;
-        this.lines[lineId].trains.push(newTrain);
-        Storage.save(Storage.keys.LINES, this.lines);
-
-        return newTrain;
-    }
-
-    /**
-     * Add a station to a line
-     * @param lineId id of the line
-     * @param stationId id of the station
-     */
-    addStationToLine(lineId: number, stationId: number) {
-        let line = this.lines.find(line => line.id === lineId);
-        let station = this.stations.find(station => station.id === stationId);
-        let lastStationId = line.stationIds[line.stationIds.length - 1];
-        let lastStation = this.stations.find(station => station.id === lastStationId);
-
-        if (lastStation && !this.links[station.id].find(l => l.to === lastStation.id)) {
-            this.createLink(lastStation, station);
-        }
-
-        // Add the station to the line
-        line.stationIds = [...line.stationIds, stationId];
-        station.lineIds = [...station.lineIds, lineId];
-
-        // Save modified data
-        Storage.save(Storage.keys.LINES, this.lines);
-        Storage.save(Storage.keys.LINKS, this.links.map(links => links.map(link => {
-            link.drawn = false;
-            return link;
-        })));
-        Storage.save(Storage.keys.STATIONS, this.stations.map(station => {
-            station.circle = null;
-            station.text = null;
-            return station;
-        }));
-
-        this.draw();
-        this.updatePassengersItineraries([station.id]);
-    }
-
-    /**
-     * Inserts a station between two stations on a line
-     * @param lineId id of the line
-     * @param stationId id of the station
-     * @param index index to insert the station at
-     */
-    insertStationToLine(lineId: number, stationId: number, index: number) {
-        const line = this.lines.find(line => line.id === lineId);
-        const station = this.stations.find(station => station.id === stationId);
-
-        // Insert the station in the line
-        line.stationIds.splice(index, 0, station.id);
-
-        // Create the links between the stations
-        const prevStation = index - 1 >= 0 ? this.stations.find(station => station.id === line.stationIds[index - 1]) : null;
-        const nextStation = index + 1 < line.stationIds.length ? this.stations.find(station => station.id === line.stationIds[index + 1]) : null;
-        if (prevStation && !this.links[station.id].find(l => l.to === prevStation.id)) {
-            this.createLink(prevStation, station);
-        }
-        if (nextStation && !this.links[station.id].find(l => l.to === nextStation.id)) {
-            this.createLink(station, nextStation);
-        }
-
-        // Save modified data
-        Storage.save(Storage.keys.LINES, this.lines);
-        Storage.save(Storage.keys.LINKS, this.links.map(links => links.map(link => {
-            link.drawn = false;
-            return link;
-        })));
-        Storage.save(Storage.keys.STATIONS, this.stations.map(station => {
-            station.circle = null;
-            station.text = null;
-            return station;
-        }));
-
-        this.updatePassengersItineraries([station.id]);
-        this.draw();
-    }
-
-
-    /**
-     * Removes a station from a line
-     * @warning this does not removes the link between the stations
-     * @param lineId id of the line
-     * @param stationId id of the station
-     * @returns 
-     */
-    removeStationFromLine(lineId: number, stationId: number) {
-        let line = this.lines.find(line => line.id === lineId);
-        let station = this.stations.find(station => station.id === stationId);
-
-        // Remove the station from the line
-        let index = line.stationIds.indexOf(station.id);
-        line.stationIds.splice(index, 1);
-        index = station.lineIds.indexOf(line.id);
-        station.lineIds.splice(index, 1);
-
-        // Save modified data
-        Storage.save(Storage.keys.LINES, this.lines);
-        Storage.save(Storage.keys.STATIONS, this.stations.map(station => {
-            station.circle = null;
-            station.text = null;
-            return station;
-        }));
-
-        this.updatePassengersItineraries([station.id]);
-        this.draw();
+            this.lines = lines;
+            if (this.lines.length > 0)
+                this.draw();
+        });
     }
 
     /**
@@ -264,15 +118,15 @@ export class GameRenderer {
      * @param station1 
      * @param station2 
      */
-    private createLink(station1: Station, station2: Station) {
+    createLink(station1: Station, station2: Station) {
         // Create the links between the station and the line if it doesn't already exist
-        let link1: Link = {
+        let link1: ILink = {
             from: station2.id,
             to: station1.id,
             tracks: 2,
         };
         this.links[station2.id].push(link1);
-        let link2: Link = {
+        let link2: ILink = {
             from: station1.id,
             to: station2.id,
             tracks: 2,
@@ -283,6 +137,11 @@ export class GameRenderer {
         station1.linkedTo.push(station2.id);
     }
 
+    /**
+     * Deletes a link between two stations
+     * @param station1Id 
+     * @param station2Id 
+     */
     deleteLink(station1Id: number, station2Id: number) {
         this.links[station1Id].splice(this.links[station1Id].findIndex(l => l.to === station2Id), 1);
         this.links[station2Id].splice(this.links[station2Id].findIndex(l => l.to === station1Id), 1);
@@ -299,9 +158,11 @@ export class GameRenderer {
             station.text = null;
             return station;
         }));
-        this.draw();
     }
 
+    /**
+     * Updates the screen
+     */
     draw() {
         Storage.save(Storage.keys.GAMEDATA, this.gameData);
 
@@ -372,7 +233,7 @@ export class GameRenderer {
                 this.stations[i].passengersArrivalRate = 1;
                 this.stations[i].nextPassengerArrival = this.gameData.settings.passengerArrivalInterval + Math.random() * this.gameData.settings.passengerArrivalIntervalVariation;
 
-                this.draw();
+                this.draw(lines);
             }
         } else {
             this.gameData.time.nextStationSpawn -= elapsedTime;
@@ -392,7 +253,7 @@ export class GameRenderer {
                     if (destinationStation) {
                         station.nextPassengerArrival = (this.gameData.settings.passengerArrivalInterval + Math.random() * this.gameData.settings.passengerArrivalIntervalVariation) / station.passengersArrivalRate;
 
-                        let passenger: Passenger =
+                        let passenger: IPassenger =
                         {
                             id: this.gameData.stats.passengersCreated++,
                             name: "Passenger " + this.gameData.stats.passengersCreated,
@@ -414,6 +275,7 @@ export class GameRenderer {
                 }
             }
         }
+
         // Update Trains on each line
         for (let i = 0; i < this.lines.length; i++) {
             const line = this.lines[i];
@@ -441,12 +303,12 @@ export class GameRenderer {
                 // Train is not moving and we can start it => start its schedule
                 if (!train.location.currentLink) {
                     if (this.gameData.time.seconds - line.trainSchedule.previousDepartureTime > line.trainSchedule.intervalSeconds) {
-                        // Check if passengers need to board
-                        this.boardPassengersToTrain(train, line.stationIds[0], line.stationIds[1]);
-
+                        train.location.stationIndex = 1;
                         line.trainSchedule.previousDepartureTime = this.gameData.time.seconds;
                         train.location.currentLink = this.links[line.stationIds[0]].find(l => l.to === line.stationIds[1]);
-                        train.location.stationIndex = 1;
+
+                        // Check if passengers need to board
+                        train.boardPassengers(this, line, line.stationIds[0]);
                     } else {
                         continue;
                     }
@@ -516,10 +378,10 @@ export class GameRenderer {
 
                     let prevPassengerCount = currentStation.waitingPassengers.length;
                     // Check if passengers need to disembark
-                    this.disembarkPassengersFromTrain(train, currentStationId, newStationId);
+                    train.disembarkPassengers(this, line, currentStationId);
 
                     // Check if passengers need to board
-                    this.boardPassengersToTrain(train, currentStationId, newStationId);
+                    train.boardPassengers(this, line, currentStationId);
 
                     // Check if the station needs to be redrawn
                     this.checkStationForRedraw(prevPassengerCount, currentStation);
@@ -535,7 +397,11 @@ export class GameRenderer {
         }
     }
 
-    private updatePassengersItineraries(affectedStationIds: number[]) {
+    /**
+     * Updates the itineraries of passengers linked to the specified stations.
+     * @param affectedStationIds Station Ids that need to be redrawn
+     */
+    updatePassengersItineraries(affectedStationIds: number[]) {
         for (let i = 0; i < this.stations.length; i++) {
             const station = this.stations[i];
             for (let j = 0; j < station.waitingPassengers.length; j++) {
@@ -546,50 +412,6 @@ export class GameRenderer {
                     if (p.itinerary.length === 0)
                         console.log(`No path found for passenger ${p.name}: ${this.stations[p.startStationId].name} -> ${this.stations[p.endStationId].name}`);
                 }
-            }
-        }
-    }
-
-    private disembarkPassengersFromTrain(train: Train, currentStationId: number, newStationId: number) {
-        let currentStation = this.stations[currentStationId];
-
-        for (let i = 0; i < train.passengers.length; i++) {
-            const p = train.passengers[i];
-
-            // A Passenger needs to disembark if:
-            // - It is at the end of its itinerary
-            // - The next station on the itinerary is not the same as the next station of the train
-            let currentStationItineraryIndex = p.itinerary.indexOf(currentStationId);
-            if ((p.itinerary.length - 1 === currentStationItineraryIndex) || (p.itinerary[currentStationItineraryIndex + 1] !== newStationId)) {
-                // Disembark the passenger
-                train.passengers.splice(i, 1);
-                i--;
-
-                // If the passenger is at the end of its itinerary, don't add it to the station waiting list
-                if (p.itinerary.length - 1 != currentStationItineraryIndex)
-                    currentStation.waitingPassengers.push(p);
-                else
-                    this.gameData.stats.passengersServed = this.gameData.stats.passengersServed + 1;
-            }
-        }
-    }
-
-    private boardPassengersToTrain(train: Train, currentStationId: number, newStationId: number) {
-        let currentStation = this.stations[currentStationId];
-
-        for (let i = 0; i < currentStation.waitingPassengers.length; i++) {
-            if (train.passengers.length > train.info.capacity)
-                break;
-
-            const p = currentStation.waitingPassengers[i];
-            // A passenger can board if:
-            // - The next station on the itinerary is the same as the next station of the train
-            let currentStationItineraryIndex = p.itinerary.indexOf(currentStationId);
-            if (p.itinerary[currentStationItineraryIndex + 1] === newStationId) {
-                // Board the passenger
-                train.passengers.push(p);
-                currentStation.waitingPassengers.splice(i, 1);
-                i--;
             }
         }
     }
@@ -653,11 +475,10 @@ export class GameRenderer {
         // Station lines
         let gradientStops: Stop[] = [];
         for (let i = 0; i < station.lineIds.length; i++) {
-            const id = station.lineIds[i];
-            const line = this.lines[id];
-            console.log(i / station.lineIds.length, line.color);
+            const lineId = station.lineIds[i];
+            const line = this.lines[lineId];
+
             gradientStops.push(new Two.Stop(i / station.lineIds.length, line.color));
-            console.log((i + 1) / station.lineIds.length, line.color);
             gradientStops.push(new Two.Stop((i + 1) / station.lineIds.length, line.color));
         }
 
@@ -697,16 +518,16 @@ export class GameRenderer {
                 this.tracks[link.from][link.to] = [];
                 this.tracks[link.to][link.from] = [];
 
-                let lines = this.drawTracks(link, 1);
+                let tracks = this.drawTracks(link, 1);
                 link.drawn = true;
                 let oppositelink = this.links[link.to].find((l) => l.to === link.from);
                 oppositelink.drawn = true;
-                this.tracks[link.from][link.to] = lines;
+                this.tracks[link.from][link.to] = tracks;
             }
         }
     }
 
-    private drawTracks(link: Link, width: number, colors = ["#626c80"], count?): TwoLine[] {
+    private drawTracks(link: ILink, width: number, colors = ["#626c80"], count?): TwoLine[] {
         let fromStation = this.stations[link.from];
         let toStation = this.stations[link.to];
 
@@ -721,7 +542,7 @@ export class GameRenderer {
         let num = count || link.tracks;
 
 
-        let lines: TwoLine[] = [];
+        let tracks: TwoLine[] = [];
         if (colors.length === 1) {
             // In this case, we draw the actual tracks
             let offset = -(num - 1);
@@ -735,7 +556,7 @@ export class GameRenderer {
                 );
                 line.linewidth = width;
                 line.stroke = color;
-                lines.push(line);
+                tracks.push(line);
             }
         } else {
             // In this case, we draw the network lines
@@ -752,23 +573,11 @@ export class GameRenderer {
                 line.stroke = color;
                 (line as any).dashes = [10, 10];
                 (line.dashes as any).offset = offset;
-                lines.push(line);
+                tracks.push(line);
             }
         }
 
-        return lines;
-    }
-
-    private getLinesUsingLink(link: Link) {
-        return this.lines.filter((l) => {
-            let f = l.stationIds.indexOf(link.from);
-            if (l.stationIds[f + 1] === link.to) {
-                return true;
-            } else {
-                f = l.stationIds.indexOf(link.to)
-                return l.stationIds[f + 1] === link.from;
-            }
-        });
+        return tracks;
     }
 
     private measure(lat1: number, lon1: number, lat2: number, lon2: number) {  // generally used geo measurement function

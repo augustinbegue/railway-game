@@ -1,4 +1,4 @@
-import type { Line } from "../types";
+import type { ILine } from "../types";
 
 export class Storage {
     static keys = {
@@ -12,7 +12,7 @@ export class Storage {
     static save(key: string, value: object) {
         switch (key) {
             case Storage.keys.LINES:
-                value = (value as Line[]).map(line => {
+                value = (value as ILine[]).map(line => {
                     line.trains = line.trains.map(train => {
                         train.element = null;
                         return train;

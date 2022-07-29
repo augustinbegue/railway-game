@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
 
-    import type { GameRenderer } from "../modules/renderer";
+    import type { GameRenderer } from "../modules/GameRenderer";
 
     export let renderer: GameRenderer;
 </script>

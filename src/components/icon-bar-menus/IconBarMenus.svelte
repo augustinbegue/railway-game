@@ -1,8 +1,8 @@
 <script lang="ts">
     import { onMount } from "svelte";
 
-    import type { GameRenderer } from "../../modules/renderer";
-    import { Storage } from "../../modules/storage";
+    import type { GameRenderer } from "../../modules/GameRenderer";
+    import { Storage } from "../../modules/Storage";
 
     import LinesMenu from "./LinesMenu.svelte";
     import TrainsMenu from "./TrainsMenu.svelte";
