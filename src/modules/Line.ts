@@ -154,7 +154,7 @@ export class Line extends GameObject implements ILine {
             lines = [...lines, new Line(id, line)];
             return lines;
         });
-
+        Storage.saveDynamic();
     }
 
     /**
@@ -173,5 +173,6 @@ export class Line extends GameObject implements ILine {
             trainSchedules[line.id] = trainSchedule;
             return trainSchedules;
         });
+        Storage.saveDynamic();
     }
 }

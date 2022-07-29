@@ -269,6 +269,7 @@ export class Train extends GameObject implements ITrain {
     static addType(trainType: ITrain) {
         trainType.id = Train.types.length;
         Train.types.push(trainType);
+        Storage.save(Storage.keys.TRAIN_TYPES, Train.types);
     }
 
     /**
@@ -277,6 +278,7 @@ export class Train extends GameObject implements ITrain {
      */
     static editType(trainType: ITrain) {
         Train.types[trainType.id] = trainType;
+        Storage.save(Storage.keys.TRAIN_TYPES, Train.types);
     }
 
     /**
@@ -291,5 +293,6 @@ export class Train extends GameObject implements ITrain {
 
             return trainByLines;
         });
+        Storage.saveDynamic();
     }
 }

@@ -125,6 +125,10 @@ export class GameRenderer {
 
         station2.linkedTo.push(station1.id);
         station1.linkedTo.push(station2.id);
+
+        // Save modified data
+        Storage.save(Storage.keys.LINKS, this.links);
+        Storage.save(Storage.keys.STATIONS, this.stations);
     }
 
     /**
@@ -138,12 +142,21 @@ export class GameRenderer {
 
         this.stations[station1Id].linkedTo.splice(this.stations[station1Id].linkedTo.indexOf(station2Id), 1);
         this.stations[station2Id].linkedTo.splice(this.stations[station2Id].linkedTo.indexOf(station1Id), 1);
+
+        // Save modified data
+        Storage.save(Storage.keys.LINKS, this.links);
+        Storage.save(Storage.keys.STATIONS, this.stations);
     }
 
     /**
      * Updates the screen
      */
     draw() {
+        // Save current state
+        Storage.saveDynamic();
+        Storage.save(Storage.keys.LINKS, this.links);
+        Storage.save(Storage.keys.STATIONS, this.stations);
+
         // Reset scene drawing states
         this.two.clear();
         for (let i = 0; i < this.links.length; i++) {
