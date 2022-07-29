@@ -2,7 +2,7 @@ import { lines, trains, trainSchedules } from "../stores";
 import type { ILine, ITrainSchedule } from "../types";
 import { GameObject } from "./GameObject";
 import type { GameRenderer } from "./GameRenderer";
-import { Storage } from "./Storage";
+import { GameStorage } from "./GameStorage";
 
 export class Line extends GameObject implements ILine {
     id: number;
@@ -101,16 +101,16 @@ export class Line extends GameObject implements ILine {
      * Inits the lines list from the Storage
      */
     static initLines() {
-        let lineObjs: ILine[] = Storage.exists(Storage.keys.LINES)
-            ? Storage.get(Storage.keys.LINES)
+        let lineObjs: ILine[] = GameStorage.exists(GameStorage.keys.LINES)
+            ? GameStorage.get(GameStorage.keys.LINES)
             : [];
         lines.set(lineObjs.map(line => {
             let l = new Line(line.id, line);
             return l;
         }));
 
-        let scheduleObjs: ITrainSchedule[] = Storage.exists(Storage.keys.TRAIN_SCHEDULES)
-            ? Storage.get(Storage.keys.TRAIN_SCHEDULES)
+        let scheduleObjs: ITrainSchedule[] = GameStorage.exists(GameStorage.keys.TRAIN_SCHEDULES)
+            ? GameStorage.get(GameStorage.keys.TRAIN_SCHEDULES)
             : [];
         trainSchedules.set(scheduleObjs);
     }
@@ -154,7 +154,7 @@ export class Line extends GameObject implements ILine {
             lines = [...lines, new Line(id, line)];
             return lines;
         });
-        Storage.saveDynamic();
+        GameStorage.saveDynamic();
     }
 
     /**
@@ -173,6 +173,6 @@ export class Line extends GameObject implements ILine {
             trainSchedules[line.id] = trainSchedule;
             return trainSchedules;
         });
-        Storage.saveDynamic();
+        GameStorage.saveDynamic();
     }
 }

@@ -1,10 +1,10 @@
 import type { Path } from "two.js/src/path";
-import type { ILine, ILink, IPassenger, ITrain, ITrainSchedule, Position } from "../types";
+import type { ILink, IPassenger, ITrain, ITrainSchedule, Position } from "../types";
 import type { GameRenderer } from "./GameRenderer";
-import { Storage } from "./Storage";
+import { GameStorage } from "./GameStorage";
 import trainsJSON from "../data/trains/rer.json";
 import type { Line } from "./Line";
-import { lines, trains } from "../stores";
+import { trains } from "../stores";
 import { GameObject } from "./GameObject";
 
 export class Train extends GameObject implements ITrain {
@@ -204,8 +204,8 @@ export class Train extends GameObject implements ITrain {
      * Inits train types from storage
      */
     static initTypes() {
-        this.types = Storage.exists(Storage.keys.TRAIN_TYPES)
-            ? Storage.get(Storage.keys.TRAIN_TYPES)
+        this.types = GameStorage.exists(GameStorage.keys.TRAIN_TYPES)
+            ? GameStorage.get(GameStorage.keys.TRAIN_TYPES)
             : [];
 
         if (this.types.length === 0) {
@@ -244,7 +244,7 @@ export class Train extends GameObject implements ITrain {
      * Init trains from storage
      */
     static initTrains() {
-        let trainsObj: ITrain[][] = Storage.exists(Storage.keys.TRAINS) ? Storage.get(Storage.keys.TRAINS) : [];
+        let trainsObj: ITrain[][] = GameStorage.exists(GameStorage.keys.TRAINS) ? GameStorage.get(GameStorage.keys.TRAINS) : [];
         trains.set(trainsObj.map(ts => ts.map(t => Train.fromJSON(t))));
     }
 
@@ -269,7 +269,7 @@ export class Train extends GameObject implements ITrain {
     static addType(trainType: ITrain) {
         trainType.id = Train.types.length;
         Train.types.push(trainType);
-        Storage.save(Storage.keys.TRAIN_TYPES, Train.types);
+        GameStorage.save(GameStorage.keys.TRAIN_TYPES, Train.types);
     }
 
     /**
@@ -278,7 +278,7 @@ export class Train extends GameObject implements ITrain {
      */
     static editType(trainType: ITrain) {
         Train.types[trainType.id] = trainType;
-        Storage.save(Storage.keys.TRAIN_TYPES, Train.types);
+        GameStorage.save(GameStorage.keys.TRAIN_TYPES, Train.types);
     }
 
     /**
@@ -293,6 +293,6 @@ export class Train extends GameObject implements ITrain {
 
             return trainByLines;
         });
-        Storage.saveDynamic();
+        GameStorage.saveDynamic();
     }
 }

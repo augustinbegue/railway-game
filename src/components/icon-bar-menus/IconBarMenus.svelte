@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
 
     import type { GameRenderer } from "../../modules/GameRenderer";
-    import { Storage } from "../../modules/Storage";
+    import { GameStorage } from "../../modules/GameStorage";
 
     import LinesMenu from "./LinesMenu.svelte";
     import TrainsMenu from "./TrainsMenu.svelte";
@@ -52,7 +52,9 @@
             bind:this={trainsButton}
             on:click={() => setActiveIcon("trains")}>Trains</button
         >
-        <button class="icon-bar-button" on:click={Storage.reset}>Reset</button>
+        <button class="icon-bar-button" on:click={GameStorage.reset}
+            >Reset</button
+        >
     </div>
     {#if linesMenu}
         <LinesMenu {renderer} />

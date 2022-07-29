@@ -2,7 +2,6 @@
     import { onMount } from "svelte";
 
     import type { GameRenderer } from "../../modules/GameRenderer";
-    import { Storage } from "../../modules/Storage";
     import { Train } from "../../modules/Train";
     import type { ITrain } from "../../types";
 

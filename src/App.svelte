@@ -16,7 +16,7 @@
     import StatsDisplayComponent from "./components/StatsDisplayComponent.svelte";
     import stationsJSON from "./data/scraping/stations-rer.json";
     import { GameRenderer } from "./modules/GameRenderer";
-    import { Storage } from "./modules/Storage";
+    import { GameStorage } from "./modules/GameStorage";
     import { Train } from "./modules/Train";
     import { Line } from "./modules/Line";
     import { gameData } from "./stores";
@@ -28,8 +28,8 @@
         endLong: "2.778065636995385",
     };
 
-    let stations: Station[] = Storage.exists(Storage.keys.STATIONS)
-        ? Storage.get(Storage.keys.STATIONS)
+    let stations: Station[] = GameStorage.exists(GameStorage.keys.STATIONS)
+        ? GameStorage.get(GameStorage.keys.STATIONS)
         : [];
 
     if (stations.length === 0) {
@@ -58,8 +58,8 @@
     Line.initLines();
     Train.initTypes();
     Train.initTrains();
-    if (Storage.exists(Storage.keys.GAMEDATA))
-        gameData.set(Storage.get(Storage.keys.GAMEDATA));
+    if (GameStorage.exists(GameStorage.keys.GAMEDATA))
+        gameData.set(GameStorage.get(GameStorage.keys.GAMEDATA));
 
     // Drawing constants
     let renderer: GameRenderer;

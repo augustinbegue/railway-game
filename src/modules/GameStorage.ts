@@ -2,7 +2,7 @@ import { gameData, lines, trains, trainSchedules } from "../stores";
 import type { Line } from "./Line";
 import type { Train } from "./Train";
 
-export class Storage {
+export class GameStorage {
     static readonly keys = {
         LINES: "lines",
         LINKS: "links",
@@ -15,29 +15,29 @@ export class Storage {
 
     static saveDynamic() {
         lines.update(lines => {
-            localStorage.setItem(Storage.keys.LINES, JSON.stringify(lines));
+            localStorage.setItem(GameStorage.keys.LINES, JSON.stringify(lines));
             return lines;
         });
         trains.update(trains => {
-            localStorage.setItem(Storage.keys.TRAINS, JSON.stringify(trains));
+            localStorage.setItem(GameStorage.keys.TRAINS, JSON.stringify(trains));
             return trains;
         });
         trainSchedules.update(trainSchedules => {
-            localStorage.setItem(Storage.keys.TRAIN_SCHEDULES, JSON.stringify(trainSchedules));
+            localStorage.setItem(GameStorage.keys.TRAIN_SCHEDULES, JSON.stringify(trainSchedules));
             return trainSchedules;
         });
         gameData.update(gameData => {
-            localStorage.setItem(Storage.keys.GAMEDATA, JSON.stringify(gameData));
+            localStorage.setItem(GameStorage.keys.GAMEDATA, JSON.stringify(gameData));
             return gameData;
         });
     };
 
     static save(key: string, value: object) {
         switch (key) {
-            case Storage.keys.TRAINS:
+            case GameStorage.keys.TRAINS:
                 value = (value as Train[][]).map((trains: Train[]) => trains.map((train: Train) => { return train.toJSON(); }));
                 break;
-            case Storage.keys.LINES:
+            case GameStorage.keys.LINES:
                 value = (value as Line[]).map((line: Line) => { return line.toJSON(); });
             default:
                 break;

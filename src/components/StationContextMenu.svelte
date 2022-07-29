@@ -1,11 +1,8 @@
 <script lang="ts">
-    import { each } from "svelte/internal";
     import type { GameRenderer } from "../modules/GameRenderer";
-    import { Line } from "../modules/Line";
-    import { Storage } from "../modules/Storage";
     import { lines } from "../stores";
 
-    import type { ILine, Station } from "../types";
+    import type { Station } from "../types";
 
     export let renderer: GameRenderer;
     export let station: Station;
@@ -62,7 +59,7 @@
         link1.drawn = false;
         link2.drawn = false;
 
-        renderer.draw($lines);
+        renderer.draw();
     }
     function deleteLink(from: number, to: number) {
         renderer.deleteLink(from, to);

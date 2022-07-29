@@ -1,4 +1,3 @@
-import type { Writable } from "svelte/store";
 import { gameData } from "../stores";
 import type { GameData } from "../types";
 

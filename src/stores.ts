@@ -1,6 +1,5 @@
 import { Writable, writable } from "svelte/store";
 import type { Line } from "./modules/Line";
-import { Storage } from "./modules/Storage";
 import type { Train } from "./modules/Train";
 import type { GameData, ITrainSchedule } from "./types";
 

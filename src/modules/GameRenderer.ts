@@ -1,12 +1,10 @@
-import { writable, Writable } from "svelte/store";
 import Two from "two.js";
 import type { Stop } from "two.js/src/effects/stop";
-import type { Path } from "two.js/src/path";
 import type { Line as TwoLine } from "two.js/src/shapes/line";
 import { gameData, lines, trains, trainSchedules } from "../stores";
-import type { GameMap, GameData, ILine, ILink, Station, ITrain, IPassenger, ITrainSchedule } from "../types";
+import type { GameMap, GameData, ILink, Station, IPassenger, ITrainSchedule } from "../types";
 import type { Line } from "./Line";
-import { Storage } from "./Storage";
+import { GameStorage } from "./GameStorage";
 import type { Train } from "./Train";
 
 export class GameRenderer {
@@ -127,8 +125,8 @@ export class GameRenderer {
         station1.linkedTo.push(station2.id);
 
         // Save modified data
-        Storage.save(Storage.keys.LINKS, this.links);
-        Storage.save(Storage.keys.STATIONS, this.stations);
+        GameStorage.save(GameStorage.keys.LINKS, this.links);
+        GameStorage.save(GameStorage.keys.STATIONS, this.stations);
     }
 
     /**
@@ -144,8 +142,8 @@ export class GameRenderer {
         this.stations[station2Id].linkedTo.splice(this.stations[station2Id].linkedTo.indexOf(station1Id), 1);
 
         // Save modified data
-        Storage.save(Storage.keys.LINKS, this.links);
-        Storage.save(Storage.keys.STATIONS, this.stations);
+        GameStorage.save(GameStorage.keys.LINKS, this.links);
+        GameStorage.save(GameStorage.keys.STATIONS, this.stations);
     }
 
     /**
@@ -153,9 +151,9 @@ export class GameRenderer {
      */
     draw() {
         // Save current state
-        Storage.saveDynamic();
-        Storage.save(Storage.keys.LINKS, this.links);
-        Storage.save(Storage.keys.STATIONS, this.stations);
+        GameStorage.saveDynamic();
+        GameStorage.save(GameStorage.keys.LINKS, this.links);
+        GameStorage.save(GameStorage.keys.STATIONS, this.stations);
 
         // Reset scene drawing states
         this.two.clear();
