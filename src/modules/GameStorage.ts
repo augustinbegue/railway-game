@@ -1,4 +1,5 @@
 import { gameData, lines, trains, trainSchedules } from "../stores";
+import type { Station } from "../types";
 import type { Line } from "./Line";
 import type { Train } from "./Train";
 
@@ -39,6 +40,12 @@ export class GameStorage {
                 break;
             case GameStorage.keys.LINES:
                 value = (value as Line[]).map((line: Line) => { return line.toJSON(); });
+            case GameStorage.keys.STATIONS:
+                value = (value as Station[]).map((station: Station) => {
+                    station.circle = null;
+                    station.text = null;
+                    return station;
+                });
             default:
                 break;
         }
