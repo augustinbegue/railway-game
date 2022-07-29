@@ -1,8 +1,8 @@
 <script lang="ts">
     import { onMount } from "svelte";
 
-    import type { GameRenderer } from "../../modules/renderer";
-    import { Storage } from "../../modules/storage";
+    import type { GameRenderer } from "../../modules/GameRenderer";
+    import { GameStorage } from "../../modules/GameStorage";
 
     import LinesMenu from "./LinesMenu.svelte";
     import TrainsMenu from "./TrainsMenu.svelte";
@@ -12,23 +12,24 @@
     type tab = "lines" | "trains";
     let currentTab: tab | "" = "lines";
     let linesButton: HTMLElement;
-    let linesMenu: HTMLElement;
     let trainsButton: HTMLElement;
-    let trainsMenu: HTMLElement;
+    let linesMenu = false;
+    let trainsMenu = false;
+
     function setActiveIcon(pressed: tab) {
         linesButton.classList.remove("active");
-        linesMenu.style.display = "none";
         trainsButton.classList.remove("active");
-        trainsMenu.style.display = "none";
+        linesMenu = false;
+        trainsMenu = false;
 
         if (pressed === "lines" && currentTab != "lines") {
             linesButton.classList.add("active");
-            linesMenu.style.display = null;
             currentTab = "lines";
+            linesMenu = true;
         } else if (pressed === "trains" && currentTab != "trains") {
             trainsButton.classList.add("active");
-            trainsMenu.style.display = null;
             currentTab = "trains";
+            trainsMenu = true;
         } else {
             currentTab = "";
         }
@@ -51,14 +52,16 @@
             bind:this={trainsButton}
             on:click={() => setActiveIcon("trains")}>Trains</button
         >
-        <button class="icon-bar-button" on:click={Storage.reset}>Reset</button>
+        <button class="icon-bar-button" on:click={GameStorage.reset}
+            >Reset</button
+        >
     </div>
-    <div bind:this={linesMenu}>
+    {#if linesMenu}
         <LinesMenu {renderer} />
-    </div>
-    <div bind:this={trainsMenu}>
+    {/if}
+    {#if trainsMenu}
         <TrainsMenu {renderer} />
-    </div>
+    {/if}
 </div>
 
 <style lang="postcss">

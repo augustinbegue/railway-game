@@ -1,6 +1,7 @@
 import type Two from "src/two";
 import type { Circle } from "two.js/src/shapes/circle";
 import type { Text } from "two.js/src/text";
+import type { Train } from "./modules/Train";
 
 export interface GameData {
     time: {
@@ -53,7 +54,7 @@ export interface Station {
     text?: Text;
     spawned: boolean;
     // Passengers in the station
-    waitingPassengers: Passenger[];
+    waitingPassengers: IPassenger[];
     // Max number of passengers that can be waiting at this station
     waitingPassengersMax: number;
     // Number of passengers arriving at this station per minute
@@ -62,7 +63,7 @@ export interface Station {
     nextPassengerArrival: number;
 }
 
-export interface Passenger {
+export interface IPassenger {
     id: number;
     name: string;
     startStationId: number;
@@ -74,28 +75,28 @@ export interface Passenger {
 }
 
 // Graph Edges
-export interface Link {
+export interface ILink {
     from: number;
     to: number;
     tracks: number;
     drawn?: boolean;
 }
 
-export interface Line {
+export interface ILine {
     id: number;
     name: string;
     color: string;
     stationIds: number[];
     hidden: boolean;
-    trains: Train[];
-    trainSchedule: {
-        intervalSeconds: number;
-        stoppingTimeSeconds: number;
-        previousDepartureTime: number;
-    }
 }
 
-export interface Train {
+export interface ITrainSchedule {
+    intervalSeconds: number;
+    stoppingTimeSeconds: number;
+    previousDepartureTime: number;
+}
+
+export interface ITrain {
     id: number;
     info: {
         name: string;
@@ -108,11 +109,11 @@ export interface Train {
         stopped: boolean;
         stoppedTime: number;
         stationIndex: number;
-        currentLink: Link;
+        currentLink: ILink;
         percent: number;
         trackIsForward: boolean;
         reverseTrip: boolean;
     };
-    element: Two.Shape;
-    passengers: Passenger[];
+    element: Path;
+    passengers: IPassenger[];
 }

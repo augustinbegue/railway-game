@@ -1,23 +1,25 @@
 <script lang="ts">
     import type {
         GameMap,
-        Line,
+        ILine,
         Station,
-        Link,
+        ILink,
         Position,
-        Train,
+        ITrain,
         GameData,
     } from "./types";
     import Two from "two.js";
     import { onMount } from "svelte";
-    import { GameRenderer } from "./modules/renderer";
     import StationContextMenu from "./components/StationContextMenu.svelte";
     import IconBarMenus from "./components/icon-bar-menus/IconBarMenus.svelte";
     import TimeDisplayComponent from "./components/TimeDisplayComponent.svelte";
-    import stationsJSON from "./data/scraping/stations-rer.json";
-    import trainsJSON from "./data/trains/rer.json";
-    import { Storage } from "./modules/storage";
     import StatsDisplayComponent from "./components/StatsDisplayComponent.svelte";
+    import stationsJSON from "./data/scraping/stations-rer.json";
+    import { GameRenderer } from "./modules/GameRenderer";
+    import { GameStorage } from "./modules/GameStorage";
+    import { Train } from "./modules/Train";
+    import { Line } from "./modules/Line";
+    import { gameData } from "./stores";
 
     let map: GameMap = {
         startLat: "49.467176211864015",
@@ -26,8 +28,8 @@
         endLong: "2.778065636995385",
     };
 
-    let stations: Station[] = Storage.exists(Storage.keys.STATIONS)
-        ? Storage.get(Storage.keys.STATIONS)
+    let stations: Station[] = GameStorage.exists(GameStorage.keys.STATIONS)
+        ? GameStorage.get(GameStorage.keys.STATIONS)
         : [];
 
     if (stations.length === 0) {
@@ -53,65 +55,11 @@
         }
     }
 
-    let lines: Line[] = Storage.exists(Storage.keys.LINES)
-        ? Storage.get(Storage.keys.LINES)
-        : [];
-
-    let trains: Train[] = Storage.exists(Storage.keys.TRAINS)
-        ? Storage.get(Storage.keys.TRAINS)
-        : [];
-
-    if (trains.length === 0) {
-        for (let i = 0; i < trainsJSON.length; i++) {
-            const t = trainsJSON[i];
-
-            trains.push({
-                id: i,
-                info: {
-                    name: t.info.name,
-                    maxSpeed: parseInt(t.info.maxSpeed),
-                    capacity: parseInt(t.info.capacity),
-                },
-                location: {
-                    running: false,
-                    stopped: false,
-                    stoppedTime: 0,
-                    stationIndex: 0,
-                    currentLink: null,
-                    percent: 0,
-                    trackIsForward: true,
-                    reverseTrip: false,
-                    position: {
-                        x: 0,
-                        y: 0,
-                    },
-                },
-                element: null,
-                passengers: [],
-            });
-        }
-    }
-
-    let gameData: GameData = Storage.exists(Storage.keys.GAMEDATA)
-        ? Storage.get(Storage.keys.GAMEDATA)
-        : {
-              time: {
-                  multiplicator: 1,
-                  seconds: 12 * 60 * 60,
-                  nextStationSpawn: 0,
-              },
-              stats: {
-                  passengersCreated: 0,
-                  passengersServed: 0,
-              },
-              settings: {
-                  stationStartNumber: 3,
-                  stationSpawnTime: 600,
-                  stationSpawnTimeVariation: 120,
-                  passengerArrivalInterval: 60,
-                  passengerArrivalIntervalVariation: 30,
-              },
-          };
+    Line.initLines();
+    Train.initTypes();
+    Train.initTrains();
+    if (GameStorage.exists(GameStorage.keys.GAMEDATA))
+        gameData.set(GameStorage.get(GameStorage.keys.GAMEDATA));
 
     // Drawing constants
     let renderer: GameRenderer;
@@ -124,7 +72,7 @@
     let minscale = 0.1;
 
     onMount(() => {
-        renderer = new GameRenderer(map, gameData, stations, lines, trains);
+        renderer = new GameRenderer(map, stations);
 
         document.body.onwheel = (e) => {
             const amount = e.deltaY < 0 ? -0.1 : 0.1;
@@ -226,8 +174,8 @@
 
 {#if renderer}
     <div class="absolute right-0 z-20">
-        <TimeDisplayComponent {renderer} />
-        <StatsDisplayComponent {renderer} />
+        <TimeDisplayComponent />
+        <StatsDisplayComponent />
     </div>
     <div class="h-full w-full absolute z-10">
         <IconBarMenus {renderer} />
