@@ -88,12 +88,12 @@ export interface ILine {
     color: string;
     stationIds: number[];
     hidden: boolean;
-    trains: Train[];
-    trainSchedule: {
-        intervalSeconds: number;
-        stoppingTimeSeconds: number;
-        previousDepartureTime: number;
-    }
+}
+
+export interface ITrainSchedule {
+    intervalSeconds: number;
+    stoppingTimeSeconds: number;
+    previousDepartureTime: number;
 }
 
 export interface ITrain {

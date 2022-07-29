@@ -5,8 +5,8 @@
     import { InteractiveElements } from "../../modules/InteractiveElements";
     import { Line } from "../../modules/Line";
     import { Train } from "../../modules/Train";
-    import { gameData, lines } from "../../stores";
-    import type { ILine } from "../../types";
+    import { gameData, lines, trains, trainSchedules } from "../../stores";
+    import type { ILine, ITrainSchedule } from "../../types";
 
     export let renderer: GameRenderer;
     export let cancelLineForm: () => void;
@@ -18,21 +18,21 @@
         color: "#ffffff",
         hidden: false,
         stationIds: [],
-        trains: [],
-        trainSchedule: {
-            intervalSeconds: 10 * 60,
-            stoppingTimeSeconds: 120,
-            previousDepartureTime: 0,
-        },
+    };
+    let defaultSchedule: ITrainSchedule = {
+        intervalSeconds: 10 * 60,
+        stoppingTimeSeconds: 30,
+        previousDepartureTime: 0,
     };
     let currentLine: ILine = defaultLine;
+    let currentSchedule: ITrainSchedule = defaultSchedule;
 
     function submitLineForm() {
         if (currentLine.name.length > 0) {
             if (currentLineId != -1) {
-                Line.editLine(currentLine);
+                Line.editLine(currentLine, currentSchedule);
             } else {
-                Line.addLine(currentLine);
+                Line.addLine(currentLine, currentSchedule);
             }
             cancelLineForm();
         }
@@ -67,28 +67,32 @@
         toggleAddTrainDropdown();
     }
 
-    $: currentLine = currentLineId != -1 ? $lines[currentLineId] : defaultLine;
-
     let toggleAddTrainDropdown: () => void;
-    let unsubscribe: () => void;
+    let unsubscribeLine: () => void;
+    let unsubscribeTrainsSchedules: () => void;
     let lineFormElement: HTMLElement;
     onMount(() => {
-        console.log("lineDetails.onMount");
-
         toggleAddTrainDropdown = InteractiveElements.Dropdown(AddTrainDropdown);
         InteractiveElements.Tabs(lineFormElement);
 
         // Stores
-        unsubscribe = lines.subscribe((lines) => {
+        unsubscribeLine = lines.subscribe((lines) => {
             if (currentLineId != -1) {
                 currentLine = lines[currentLineId].copy();
+            }
+        });
+        unsubscribeTrainsSchedules = trainSchedules.subscribe((schedules) => {
+            if (currentLineId != -1) {
+                currentSchedule = JSON.parse(
+                    JSON.stringify(schedules[currentLineId]),
+                );
             }
         });
     });
 
     onDestroy(() => {
-        console.log("lineDetails.onDestroy");
-        unsubscribe();
+        unsubscribeLine();
+        unsubscribeTrainsSchedules();
     });
 </script>
 
@@ -167,72 +171,75 @@
         </ul>
     </div>
     <div class="box-tabs-content">
-        <div>
-            <p>
-                Count: {currentLine.trains.length}
-            </p>
-            <p>
-                Time interval: {Math.round(
-                    currentLine.trainSchedule.intervalSeconds / 60,
-                )}min
-            </p>
-            <p>
-                Train last departed {Math.round(
-                    ($gameData.time.seconds -
-                        currentLine.trainSchedule.previousDepartureTime) /
-                        60,
-                )}min ago
-            </p>
-        </div>
-        <ul class="trains-list">
-            <!-- TODO: Improve this display -->
-            {#each currentLine.trains as train}
-                <li>
-                    {train.info.name}#{train.id}
-                    {#if train.location.currentLink}
-                        | {train.passengers.length}/{train.info.capacity}
-                        |
-                        {#if train.location.stopped && train.location.stationIndex}
-                            Stopped: {renderer.stations[
-                                currentLine.stationIds[
-                                    train.location.reverseTrip
-                                        ? train.location.stationIndex + 1
-                                        : train.location.stationIndex - 1
-                                ]
-                            ]?.name}
-                        {:else if train.location.stationIndex && train.location.stationIndex < currentLine.stationIds.length && !train.location.reverseTrip}
-                            {renderer.stations[
-                                currentLine.stationIds[
-                                    train.location.stationIndex - 1
-                                ]
-                            ]?.name} -> {renderer.stations[
-                                currentLine.stationIds[
-                                    train.location.stationIndex
-                                ]
-                            ]?.name}
-                        {:else if train.location.stationIndex && train.location.stationIndex + 1 < currentLine.stationIds.length && train.location.reverseTrip}
-                            {renderer.stations[
-                                currentLine.stationIds[
-                                    train.location.stationIndex + 1
-                                ]
-                            ]?.name} -> {renderer.stations[
-                                currentLine.stationIds[
-                                    train.location.stationIndex
-                                ]
-                            ]?.name}
+        {#if currentLineId != -1}
+            <div>
+                <p>
+                    Count: {$trains[currentLineId].length}
+                </p>
+                <p>
+                    Time interval: {Math.round(
+                        $trainSchedules[currentLineId].intervalSeconds / 60,
+                    )}min
+                </p>
+                <p>
+                    Train last departed {Math.round(
+                        ($gameData.time.seconds -
+                            $trainSchedules[currentLineId]
+                                .previousDepartureTime) /
+                            60,
+                    )}min ago
+                </p>
+            </div>
+            <ul class="trains-list">
+                <!-- TODO: Improve this display -->
+                {#each $trains[currentLineId] as train}
+                    <li>
+                        {train.info.name}#{train.id}
+                        {#if train.location.currentLink}
+                            | {train.passengers.length}/{train.info.capacity}
+                            |
+                            {#if train.location.stopped && train.location.stationIndex}
+                                Stopped: {renderer.stations[
+                                    currentLine.stationIds[
+                                        train.location.reverseTrip
+                                            ? train.location.stationIndex + 1
+                                            : train.location.stationIndex - 1
+                                    ]
+                                ]?.name}
+                            {:else if train.location.stationIndex && train.location.stationIndex < currentLine.stationIds.length && !train.location.reverseTrip}
+                                {renderer.stations[
+                                    currentLine.stationIds[
+                                        train.location.stationIndex - 1
+                                    ]
+                                ]?.name} -> {renderer.stations[
+                                    currentLine.stationIds[
+                                        train.location.stationIndex
+                                    ]
+                                ]?.name}
+                            {:else if train.location.stationIndex && train.location.stationIndex + 1 < currentLine.stationIds.length && train.location.reverseTrip}
+                                {renderer.stations[
+                                    currentLine.stationIds[
+                                        train.location.stationIndex + 1
+                                    ]
+                                ]?.name} -> {renderer.stations[
+                                    currentLine.stationIds[
+                                        train.location.stationIndex
+                                    ]
+                                ]?.name}
+                            {:else}
+                                Terminus: {renderer.stations[
+                                    currentLine.stationIds[
+                                        train.location.stationIndex
+                                    ]
+                                ]?.name}
+                            {/if}
                         {:else}
-                            Terminus: {renderer.stations[
-                                currentLine.stationIds[
-                                    train.location.stationIndex
-                                ]
-                            ]?.name}
+                            | Waiting for the next departure
                         {/if}
-                    {:else}
-                        | Waiting for the next departure
-                    {/if}
-                </li>
-            {/each}
-        </ul>
+                    </li>
+                {/each}
+            </ul>
+        {/if}
         <div class="button-dropdown" bind:this={AddTrainDropdown}>
             <button>
                 <i class="fas fa-plus" /> Add a train
@@ -256,16 +263,13 @@
         </div>
         <span>
             <p>Interval between trains:</p>
-            <input
-                type="number"
-                bind:value={currentLine.trainSchedule.intervalSeconds}
-            />
+            <input type="number" bind:value={currentSchedule.intervalSeconds} />
         </span>
         <span>
             <p>Stopping time at stations:</p>
             <input
                 type="number"
-                bind:value={currentLine.trainSchedule.stoppingTimeSeconds}
+                bind:value={currentSchedule.stoppingTimeSeconds}
             />
         </span>
     </div>

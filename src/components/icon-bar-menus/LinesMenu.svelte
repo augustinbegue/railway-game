@@ -81,7 +81,9 @@
     </div>
 
     {#if currentLineId != null}
-        <LinesDetails {cancelLineForm} {renderer} {currentLineId} />
+        {#key currentLineId}
+            <LinesDetails {cancelLineForm} {renderer} {currentLineId} />
+        {/key}
     {/if}
 </div>
 

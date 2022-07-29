@@ -3,21 +3,24 @@ import Two from "two.js";
 import type { Stop } from "two.js/src/effects/stop";
 import type { Path } from "two.js/src/path";
 import type { Line as TwoLine } from "two.js/src/shapes/line";
-import { gameData, lines } from "../stores";
-import type { GameMap, GameData, ILine, ILink, Station, ITrain, IPassenger } from "../types";
+import { gameData, lines, trains, trainSchedules } from "../stores";
+import type { GameMap, GameData, ILine, ILink, Station, ITrain, IPassenger, ITrainSchedule } from "../types";
 import type { Line } from "./Line";
 import { Storage } from "./Storage";
+import type { Train } from "./Train";
 
 export class GameRenderer {
     two: Two;
 
-    _gameData: GameData;
+    gameData: GameData;
 
     map: GameMap;
     stations: Station[];
     links: ILink[][] = [];
     tracks: TwoLine[][][] = [];
     lines: Line[] = [];
+    trainSchedules: ITrainSchedule[] = [];
+    trains: Train[][] = [];
 
     readonly overcrowdedColor = "#f54242";
 
@@ -80,8 +83,6 @@ export class GameRenderer {
             }
         }
 
-        let rect = document.body.getBoundingClientRect();
-
         // Center the camera on the first station
         this.two.scene.translation.x = -(this.stations[0].position.x);
         this.two.scene.translation.y = -(this.stations[0].position.y);
@@ -91,10 +92,14 @@ export class GameRenderer {
             if (this.lines.length > 0)
                 this.draw();
         });
-
         gameData.subscribe(gameData => {
-            this._gameData = gameData;
-            Storage.save(Storage.keys.GAMEDATA, gameData);
+            this.gameData = gameData;
+        });
+        trains.subscribe(trains => {
+            this.trains = trains;
+        });
+        trainSchedules.subscribe(trainSchedules => {
+            this.trainSchedules = trainSchedules;
         });
     }
 
@@ -133,16 +138,6 @@ export class GameRenderer {
 
         this.stations[station1Id].linkedTo.splice(this.stations[station1Id].linkedTo.indexOf(station2Id), 1);
         this.stations[station2Id].linkedTo.splice(this.stations[station2Id].linkedTo.indexOf(station1Id), 1);
-
-        Storage.save(Storage.keys.LINKS, this.links.map(links => links.map(link => {
-            link.drawn = false;
-            return link;
-        })));
-        Storage.save(Storage.keys.STATIONS, this.stations.map(station => {
-            station.circle = null;
-            station.text = null;
-            return station;
-        }));
     }
 
     /**
@@ -196,17 +191,17 @@ export class GameRenderer {
 
     update(frameCount: number, timeDelta: number) {
         // Updating GameTime
-        let elapsedTime = (timeDelta / 1000) * this._gameData.time.multiplicator;
-        this._gameData.time.seconds += (timeDelta / 1000) * this._gameData.time.multiplicator;
+        let elapsedTime = (timeDelta / 1000) * this.gameData.time.multiplicator;
+        this.gameData.time.seconds += (timeDelta / 1000) * this.gameData.time.multiplicator;
 
         // Update stations spawn time
-        if (this._gameData.time.nextStationSpawn <= 0) {
-            this._gameData.time.nextStationSpawn = this._gameData.settings.stationSpawnTime + Math.random() * this._gameData.settings.stationSpawnTimeVariation;
+        if (this.gameData.time.nextStationSpawn <= 0) {
+            this.gameData.time.nextStationSpawn = this.gameData.settings.stationSpawnTime + Math.random() * this.gameData.settings.stationSpawnTimeVariation;
             let i = 0
             for (; i < this.stations.length && this.stations[i].spawned; i++) { }
 
-            if (i < this._gameData.settings.stationStartNumber - 1)
-                this._gameData.time.nextStationSpawn = 0;
+            if (i < this.gameData.settings.stationStartNumber - 1)
+                this.gameData.time.nextStationSpawn = 0;
             if (i < this.stations.length) {
                 // Spawn station and set its initial values
                 this.stations[i].spawned = true;
@@ -214,12 +209,12 @@ export class GameRenderer {
                 this.stations[i].waitingPassengers = [];
                 this.stations[i].waitingPassengersMax = 100;
                 this.stations[i].passengersArrivalRate = 1;
-                this.stations[i].nextPassengerArrival = this._gameData.settings.passengerArrivalInterval + Math.random() * this._gameData.settings.passengerArrivalIntervalVariation;
+                this.stations[i].nextPassengerArrival = this.gameData.settings.passengerArrivalInterval + Math.random() * this.gameData.settings.passengerArrivalIntervalVariation;
 
                 this.draw();
             }
         } else {
-            this._gameData.time.nextStationSpawn -= elapsedTime;
+            this.gameData.time.nextStationSpawn -= elapsedTime;
         }
         let spawnedStations = this.stations.filter(s => s.spawned);
 
@@ -234,16 +229,16 @@ export class GameRenderer {
                     let destinationStation = availableStations[Math.floor(Math.random() * (availableStations.length - 1))];
 
                     if (destinationStation) {
-                        station.nextPassengerArrival = (this._gameData.settings.passengerArrivalInterval + Math.random() * this._gameData.settings.passengerArrivalIntervalVariation) / station.passengersArrivalRate;
+                        station.nextPassengerArrival = (this.gameData.settings.passengerArrivalInterval + Math.random() * this.gameData.settings.passengerArrivalIntervalVariation) / station.passengersArrivalRate;
 
                         let passenger: IPassenger =
                         {
-                            id: this._gameData.stats.passengersCreated++,
-                            name: "Passenger " + this._gameData.stats.passengersCreated,
+                            id: this.gameData.stats.passengersCreated++,
+                            name: "Passenger " + this.gameData.stats.passengersCreated,
                             startStationId: station.id,
                             endStationId: destinationStation.id,
                             itinerary: this.findPath(station.id, destinationStation.id),
-                            startTime: this._gameData.time.seconds,
+                            startTime: this.gameData.time.seconds,
                             endTime: 0,
                             waiting: true,
                         };
@@ -266,13 +261,13 @@ export class GameRenderer {
             if (line.stationIds.length < 2)
                 continue;
 
-            for (let i = 0; i < line.trains.length; i++) {
-                this._gameData.stats.passengersServed += line.trains[i].update(this, line, timeDelta);
+            for (let i = 0; i < this.trains[line.id].length; i++) {
+                this.gameData.stats.passengersServed += this.trains[line.id][i].update(this, line, this.trainSchedules[line.id], timeDelta);
             }
         }
 
-        gameData.set(this._gameData);
-        // lines.update(lines => lines);
+        gameData.set(this.gameData);
+        trains.set(this.trains);
     }
 
     checkStationForRedraw(prevStationCount: number, station: Station) {

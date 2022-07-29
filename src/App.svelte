@@ -57,6 +57,7 @@
 
     Line.initLines();
     Train.initTypes();
+    Train.initTrains();
     if (Storage.exists(Storage.keys.GAMEDATA))
         gameData.set(Storage.get(Storage.keys.GAMEDATA));
 

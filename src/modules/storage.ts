@@ -1,26 +1,24 @@
-import type { ILine } from "../types";
+import type { Line } from "./Line";
+import type { Train } from "./Train";
 
 export class Storage {
-    static keys = {
+    static readonly keys = {
         LINES: "lines",
         LINKS: "links",
         STATIONS: "stations",
         TRAINS: "trains",
+        TRAIN_TYPES: "trainTypes",
+        TRAIN_SCHEDULES: "trainSchedules",
         GAMEDATA: "gamedata",
     }
 
     static save(key: string, value: object) {
         switch (key) {
-            case Storage.keys.LINES:
-                value = (value as ILine[]).map(line => {
-                    line.trains = line.trains.map(train => {
-                        train.element = null;
-                        return train;
-                    })
-                    return line;
-                })
+            case Storage.keys.TRAINS:
+                value = (value as Train[][]).map((trains: Train[]) => trains.map((train: Train) => { return train.toJSON(); }));
                 break;
-
+            case Storage.keys.LINES:
+                value = (value as Line[]).map((line: Line) => { return line.toJSON(); });
             default:
                 break;
         }

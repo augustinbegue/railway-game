@@ -15,4 +15,6 @@ export class GameObject {
      * @returns Copy of the GameObject
      */
     copy?(): GameObject;
+    static fromJSON?(obj: any): GameObject;
+    toJSON?(): any;
 }

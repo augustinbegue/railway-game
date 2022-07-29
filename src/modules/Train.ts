@@ -1,10 +1,10 @@
 import type { Path } from "two.js/src/path";
-import type { ILine, ILink, IPassenger, ITrain, Position } from "../types";
+import type { ILine, ILink, IPassenger, ITrain, ITrainSchedule, Position } from "../types";
 import type { GameRenderer } from "./GameRenderer";
 import { Storage } from "./Storage";
 import trainsJSON from "../data/trains/rer.json";
 import type { Line } from "./Line";
-import { lines } from "../stores";
+import { lines, trains } from "../stores";
 import { GameObject } from "./GameObject";
 
 export class Train extends GameObject implements ITrain {
@@ -87,10 +87,10 @@ export class Train extends GameObject implements ITrain {
         }
     }
 
-    update(renderer: GameRenderer, line: Line, timeDelta: number) {
+    update(renderer: GameRenderer, line: Line, schedule: ITrainSchedule, timeDelta: number) {
         if (this.location.stopped) {
             // Check if this stopping time is over
-            if (this._gameData.time.seconds - this.location.stoppedTime >= line.trainSchedule.stoppingTimeSeconds) {
+            if (this._gameData.time.seconds - this.location.stoppedTime >= schedule.stoppingTimeSeconds) {
                 this.location.stopped = false;
             } else
                 return 0;
@@ -103,9 +103,9 @@ export class Train extends GameObject implements ITrain {
 
         // train is not moving and we can start it => start its schedule
         if (!this.location.currentLink) {
-            if (this._gameData.time.seconds - line.trainSchedule.previousDepartureTime > line.trainSchedule.intervalSeconds) {
+            if (this._gameData.time.seconds - schedule.previousDepartureTime > schedule.intervalSeconds) {
                 this.location.stationIndex = 1;
-                line.trainSchedule.previousDepartureTime = this._gameData.time.seconds;
+                schedule.previousDepartureTime = this._gameData.time.seconds;
                 this.location.currentLink = renderer.links[line.stationIds[0]].find(l => l.to === line.stationIds[1]);
 
                 // Check if passengers need to board
@@ -204,8 +204,8 @@ export class Train extends GameObject implements ITrain {
      * Inits train types from storage
      */
     static initTypes() {
-        this.types = Storage.exists(Storage.keys.TRAINS)
-            ? Storage.get(Storage.keys.TRAINS)
+        this.types = Storage.exists(Storage.keys.TRAIN_TYPES)
+            ? Storage.get(Storage.keys.TRAIN_TYPES)
             : [];
 
         if (this.types.length === 0) {
@@ -240,9 +240,26 @@ export class Train extends GameObject implements ITrain {
         }
     }
 
+    /**
+     * Init trains from storage
+     */
+    static initTrains() {
+        let trainsObj: ITrain[][] = Storage.exists(Storage.keys.TRAINS) ? Storage.get(Storage.keys.TRAINS) : [];
+        trains.set(trainsObj.map(ts => ts.map(t => Train.fromJSON(t))));
+    }
+
     static fromJSON(train: ITrain) {
         const t = new Train(train.id, train);
         return t;
+    }
+
+    toJSON() {
+        return {
+            id: this.id,
+            info: this.info,
+            location: this.location,
+            passengers: this.passengers,
+        };
     }
 
     /**
@@ -252,7 +269,6 @@ export class Train extends GameObject implements ITrain {
     static addType(trainType: ITrain) {
         trainType.id = Train.types.length;
         Train.types.push(trainType);
-        Storage.save(Storage.keys.TRAINS, this.types);
     }
 
     /**
@@ -261,7 +277,6 @@ export class Train extends GameObject implements ITrain {
      */
     static editType(trainType: ITrain) {
         Train.types[trainType.id] = trainType;
-        Storage.save(Storage.keys.TRAINS, this.types);
     }
 
     /**
@@ -270,10 +285,11 @@ export class Train extends GameObject implements ITrain {
      * @param lineId id of the line to add the train to
      */
     static addToLine(typeId: number, line: Line) {
-        const train = new Train(line.trains.length, Train.types[typeId]);
-        line.trains.push(train);
+        trains.update(trainByLines => {
+            const train = new Train(trainByLines[line.id].length, Train.types[typeId]);
+            trainByLines[line.id].push(train);
 
-        // Update the store
-        lines.update(lines => { lines[line.id] = line; return lines; });
+            return trainByLines;
+        });
     }
 }

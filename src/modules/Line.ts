@@ -1,10 +1,8 @@
-import { writable } from "svelte/store";
-import { lines } from "../stores";
-import type { ILine, ITrain } from "../types";
+import { lines, trains, trainSchedules } from "../stores";
+import type { ILine, ITrainSchedule } from "../types";
 import { GameObject } from "./GameObject";
 import type { GameRenderer } from "./GameRenderer";
 import { Storage } from "./Storage";
-import { Train } from "./Train";
 
 export class Line extends GameObject implements ILine {
     id: number;
@@ -12,12 +10,6 @@ export class Line extends GameObject implements ILine {
     color: string;
     stationIds: number[];
     hidden: boolean;
-    trains: Train[];
-    trainSchedule: {
-        intervalSeconds: number;
-        stoppingTimeSeconds: number;
-        previousDepartureTime: number;
-    }
 
     constructor(id: number, line: ILine) {
         super();
@@ -25,10 +17,8 @@ export class Line extends GameObject implements ILine {
         this.id = id;
         this.name = line.name;
         this.color = line.color;
-        this.stationIds = line.stationIds;
+        this.stationIds = JSON.parse(JSON.stringify(line.stationIds));
         this.hidden = line.hidden;
-        this.trains = [];
-        this.trainSchedule = JSON.parse(JSON.stringify(line.trainSchedule));
     }
 
     /**
@@ -49,17 +39,6 @@ export class Line extends GameObject implements ILine {
         this.stationIds = [...this.stationIds, stationId];
         station.lineIds = [...station.lineIds, this.id];
 
-        // TODO: Join store update and storage save
-        // Save modified data
-        Storage.save(Storage.keys.LINKS, renderer.links.map(links => links.map(link => {
-            link.drawn = false;
-            return link;
-        })));
-        Storage.save(Storage.keys.STATIONS, renderer.stations.map(station => {
-            station.circle = null;
-            station.text = null;
-            return station;
-        }));
         // Update the store
         lines.update(lines => { lines[this.id] = this; return lines; });
 
@@ -76,12 +55,6 @@ export class Line extends GameObject implements ILine {
         this.stationIds = this.stationIds.filter(id => id !== stationId);
         station.lineIds = station.lineIds.filter(lineId => lineId !== this.id);
 
-        // Save modified data
-        Storage.save(Storage.keys.STATIONS, renderer.stations.map(station => {
-            station.circle = null;
-            station.text = null;
-            return station;
-        }));
         // Update the store
         lines.update(lines => { lines[this.id] = this; return lines; });
 
@@ -111,16 +84,6 @@ export class Line extends GameObject implements ILine {
             renderer.createLink(station, nextStation);
         }
 
-        // Save modified data
-        Storage.save(Storage.keys.LINKS, renderer.links.map(links => links.map(link => {
-            link.drawn = false;
-            return link;
-        })));
-        Storage.save(Storage.keys.STATIONS, renderer.stations.map(station => {
-            station.circle = null;
-            station.text = null;
-            return station;
-        }));
         // Update the store
         lines.update(lines => { lines[this.id] = this; return lines; });
         renderer.updatePassengersItineraries([station.id]);
@@ -131,9 +94,7 @@ export class Line extends GameObject implements ILine {
      * @returns deep copy of the line
      */
     copy() {
-        let c = new Line(this.id, this);
-        c.trains = this.trains.map(train => train.copy());
-        return c;
+        return new Line(this.id, this);
     }
 
     /**
@@ -143,14 +104,15 @@ export class Line extends GameObject implements ILine {
         let lineObjs: ILine[] = Storage.exists(Storage.keys.LINES)
             ? Storage.get(Storage.keys.LINES)
             : [];
-
-        console.log("Init lines", lineObjs);
-
         lines.set(lineObjs.map(line => {
             let l = new Line(line.id, line);
-            l.trains = line.trains.map(train => new Train(train.id, train));
             return l;
         }));
+
+        let scheduleObjs: ITrainSchedule[] = Storage.exists(Storage.keys.TRAIN_SCHEDULES)
+            ? Storage.get(Storage.keys.TRAIN_SCHEDULES)
+            : [];
+        trainSchedules.set(scheduleObjs);
     }
 
     /**
@@ -160,30 +122,56 @@ export class Line extends GameObject implements ILine {
      */
     static fromJSON(lineObj: ILine) {
         const line = new Line(lineObj.id, lineObj);
-        line.trains = lineObj.trains.map((train: ITrain) => Train.fromJSON(train));
         return line;
+    }
+    toJSON() {
+        return {
+            id: this.id,
+            name: this.name,
+            color: this.color,
+            stationIds: this.stationIds,
+            hidden: this.hidden,
+        };
     }
 
     /**
      * Adds a new line to the lines list
      * @param line Line object
      */
-    static addLine(line: ILine) {
-        lines.update(lines => [...lines, new Line(lines.length, line)]);
+    static addLine(line: ILine, trainSchedule: ITrainSchedule) {
+        lines.update(lines => {
+            const id = lines.length;
+            trains.update(trains => {
+                trains[id] = [];
+                return trains;
+            });
+
+            trainSchedules.update(trainSchedules => {
+                trainSchedules[id] = trainSchedule;
+                return trainSchedules;
+            });
+
+            lines = [...lines, new Line(id, line)];
+            return lines;
+        });
+
     }
 
     /**
      * Edits a line
      * @param line Line object
      */
-    static editLine(line: ILine) {
+    static editLine(line: ILine, trainSchedule: ITrainSchedule) {
         lines.update(lines => {
             lines[line.id].name = line.name;
             lines[line.id].color = line.color;
             lines[line.id].stationIds = line.stationIds;
             lines[line.id].hidden = line.hidden;
-            lines[line.id].trainSchedule = line.trainSchedule;
             return lines;
+        });
+        trainSchedules.update(trainSchedules => {
+            trainSchedules[line.id] = trainSchedule;
+            return trainSchedules;
         });
     }
 }
