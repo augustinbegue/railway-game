@@ -10,13 +10,13 @@
     } from "./types";
     import Two from "two.js";
     import { onMount } from "svelte";
-    import { GameRenderer } from "./modules/GameRenderer";
     import StationContextMenu from "./components/StationContextMenu.svelte";
     import IconBarMenus from "./components/icon-bar-menus/IconBarMenus.svelte";
     import TimeDisplayComponent from "./components/TimeDisplayComponent.svelte";
-    import stationsJSON from "./data/scraping/stations-rer.json";
-    import { Storage } from "./modules/Storage";
     import StatsDisplayComponent from "./components/StatsDisplayComponent.svelte";
+    import stationsJSON from "./data/scraping/stations-rer.json";
+    import { GameRenderer } from "./modules/GameRenderer";
+    import { Storage } from "./modules/Storage";
     import { Train } from "./modules/Train";
     import { Line } from "./modules/Line";
     import { gameData } from "./stores";
