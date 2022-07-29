@@ -150,11 +150,6 @@ export class GameRenderer {
      * Updates the screen
      */
     draw() {
-        // Save current state
-        GameStorage.saveDynamic();
-        GameStorage.save(GameStorage.keys.LINKS, this.links);
-        GameStorage.save(GameStorage.keys.STATIONS, this.stations);
-
         // Reset scene drawing states
         this.two.clear();
         for (let i = 0; i < this.links.length; i++) {
