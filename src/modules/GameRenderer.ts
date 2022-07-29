@@ -87,8 +87,6 @@ export class GameRenderer {
         this.two.scene.translation.y = -(this.stations[0].position.y);
 
         lines.subscribe(lines => {
-            console.log("GameRenderer: lines updated", lines);
-
             this.lines = lines;
             if (this.lines.length > 0)
                 this.draw();
@@ -273,8 +271,8 @@ export class GameRenderer {
             }
         }
 
-
         gameData.set(this._gameData);
+        // lines.update(lines => lines);
     }
 
     checkStationForRedraw(prevStationCount: number, station: Station) {

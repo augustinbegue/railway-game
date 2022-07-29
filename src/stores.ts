@@ -4,10 +4,6 @@ import { Storage } from "./modules/Storage";
 import type { GameData } from "./types";
 
 export const lines: Writable<Line[]> = writable([]);
-lines.subscribe(lines => {
-    if (lines.length > 0)
-        Storage.save(Storage.keys.LINES, lines);
-});
 
 export const gameData: Writable<GameData> = writable({
     time: {

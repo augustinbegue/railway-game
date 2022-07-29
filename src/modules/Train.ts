@@ -187,9 +187,6 @@ export class Train extends GameObject implements ITrain {
 
             // Check if the station needs to be redrawn
             renderer.checkStationForRedraw(prevPassengerCount, currentStation);
-
-            // Update stores for the train
-            lines.update(lines => { lines[line.id].trains[this.id] = this; return lines; });
         }
 
         return passengersServed;
