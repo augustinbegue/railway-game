@@ -4,6 +4,7 @@ import type { Train } from "./modules/Train";
 import type { GameData, ITrainSchedule } from "./types";
 
 export const lines: Writable<Line[]> = writable([]);
+
 export const trains: Writable<Train[][]> = writable([]);
 
 export const trainSchedules: Writable<ITrainSchedule[]> = writable([]);

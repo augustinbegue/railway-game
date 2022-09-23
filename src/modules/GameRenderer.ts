@@ -19,6 +19,7 @@ export class GameRenderer {
     lines: Line[] = [];
     trainSchedules: ITrainSchedule[] = [];
     trains: Train[][] = [];
+    paths: number[][][] = [];
 
     readonly overcrowdedColor = "#f54242";
 
@@ -99,6 +100,8 @@ export class GameRenderer {
         trainSchedules.subscribe(trainSchedules => {
             this.trainSchedules = trainSchedules;
         });
+
+        this.paths = GameStorage.exists(GameStorage.keys.PATHS) ? GameStorage.get(GameStorage.keys.PATHS) : [];
     }
 
     /**
@@ -123,6 +126,12 @@ export class GameRenderer {
 
         station2.linkedTo.push(station1.id);
         station1.linkedTo.push(station2.id);
+
+        if (this.paths[station1.id] && this.paths[station1.id][station2.id])
+            this.paths[station1.id][station2.id] = [];
+
+        if (this.paths[station2.id] && this.paths[station2.id][station1.id])
+            this.paths[station2.id][station1.id] = [];
 
         // Save modified data
         GameStorage.save(GameStorage.keys.LINKS, this.links);
@@ -288,15 +297,27 @@ export class GameRenderer {
      * @param affectedStationIds Station Ids that need to be redrawn
      */
     updatePassengersItineraries(affectedStationIds: number[]) {
+        let itinerariesNotFound: boolean[][] = [];
+
         for (let i = 0; i < this.stations.length; i++) {
             const station = this.stations[i];
             for (let j = 0; j < station.waitingPassengers.length; j++) {
                 const p = station.waitingPassengers[j];
-                if (p.itinerary.length === 0 || p.itinerary.find(sId => affectedStationIds.includes(sId))) {
+
+                if (!itinerariesNotFound[p.startStationId])
+                    itinerariesNotFound[p.startStationId] = [];
+                if (!itinerariesNotFound[p.endStationId])
+                    itinerariesNotFound[p.endStationId] = [];
+
+                if ((p.itinerary.length === 0 || p.itinerary.find(sId => affectedStationIds.includes(sId))) && !itinerariesNotFound[p.startStationId][p.endStationId]) {
                     p.itinerary = this.findPath(p.startStationId, p.endStationId);
 
-                    if (p.itinerary.length === 0)
+                    if (p.itinerary.length === 0) {
                         console.log(`No path found for passenger ${p.name}: ${this.stations[p.startStationId].name} -> ${this.stations[p.endStationId].name}`);
+
+                        itinerariesNotFound[p.startStationId][p.endStationId] = true;
+                        itinerariesNotFound[p.endStationId][p.startStationId] = true;
+                    }
                 }
             }
         }
@@ -313,6 +334,11 @@ export class GameRenderer {
 
         if (!fromStation || !toStation) {
             return [];
+        }
+
+        // If a path was already found, return it
+        if (this.paths[from] && this.paths[from][to]) {
+            return this.paths[from][to];
         }
 
         visited.push(from);
@@ -334,6 +360,18 @@ export class GameRenderer {
                 }
             }
         }
+
+        // If a path was found, store it
+        if (currentPath.length > 0) {
+            if (!this.paths[from])
+                this.paths[from] = [];
+            this.paths[from][to] = [from, ...currentPath];
+
+            if (!this.paths[to])
+                this.paths[to] = [];
+            this.paths[to][from] = [...this.paths[from][to]].reverse();
+        }
+
         // Add the current station to the path only if the path is not empty
         return currentPath.length > 0 ? [from, ...currentPath] : [];
     }
@@ -407,8 +445,12 @@ export class GameRenderer {
                 let tracks = this.drawTracks(link, 1);
                 link.drawn = true;
                 let oppositelink = this.links[link.to].find((l) => l.to === link.from);
-                oppositelink.drawn = true;
-                this.tracks[link.from][link.to] = tracks;
+                if (!oppositelink) {
+                    console.error(`No oppositelink found for link ${link.from} -> ${link.to}`);
+                } else {
+                    oppositelink.drawn = true;
+                    this.tracks[link.from][link.to] = tracks;
+                }
             }
         }
     }

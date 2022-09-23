@@ -12,6 +12,7 @@ export class GameStorage {
         TRAIN_TYPES: "trainTypes",
         TRAIN_SCHEDULES: "trainSchedules",
         GAMEDATA: "gamedata",
+        PATHS: "paths",
     }
 
     static saveDynamic() {
@@ -45,6 +46,7 @@ export class GameStorage {
                 value = (value as Station[]).map((station: Station) => {
                     station.circle = null;
                     station.text = null;
+                    station.waitingPassengers = [];
                     return station;
                 });
                 break;
@@ -52,7 +54,11 @@ export class GameStorage {
                 break;
         }
 
-        localStorage.setItem(key, JSON.stringify(value));
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     static exists(key): boolean {

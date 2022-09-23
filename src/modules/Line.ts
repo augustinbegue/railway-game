@@ -52,13 +52,17 @@ export class Line extends GameObject implements ILine {
      */
     removeStation(renderer: GameRenderer, stationId: number) {
         let station = renderer.stations[stationId];
+        let stationIndexInLine = this.stationIds.indexOf(stationId);
+        let prevStation = stationIndexInLine - 1 >= 0 ? renderer.stations.find(station => station.id === this.stationIds[stationIndexInLine - 1]) : null;
+        let nextStation = stationIndexInLine + 1 < this.stationIds.length ? renderer.stations.find(station => station.id === this.stationIds[stationIndexInLine + 1]) : null;
+
         this.stationIds = this.stationIds.filter(id => id !== stationId);
         station.lineIds = station.lineIds.filter(lineId => lineId !== this.id);
 
         lines.update(lines => { lines[this.id] = this; return lines; });
         GameStorage.saveDynamic();
 
-        renderer.updatePassengersItineraries([station.id]);
+        renderer.updatePassengersItineraries([prevStation?.id, station.id, nextStation?.id]);
     }
 
     /**

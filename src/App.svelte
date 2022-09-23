@@ -122,6 +122,7 @@
             }
         };
 
+        // TODO: Prevent selection of text when dragging
         let mouse = new Two.Vector(0, 0);
         document.body.onmousemove = (e) => {
             mouse.x = e.clientX;
@@ -143,6 +144,7 @@
                         renderer.two.scene.scale,
                 );
 
+                // TODO: This becomes slow as the number of stations increases
                 for (let i = 0; i < stations.length; i++) {
                     const station = stations[i];
 

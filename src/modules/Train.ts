@@ -120,6 +120,11 @@ export class Train extends GameObject implements ITrain {
         if (!track) {
             this.location.trackIsForward = true;
             let tracks = renderer.tracks[this.location.currentLink.from][this.location.currentLink.to];
+            if (!tracks) {
+                this.location.currentLink = null;
+                return 0;
+            }
+
             if (tracks.length === 0) {
                 this.location.trackIsForward = false;
                 tracks = renderer.tracks[this.location.currentLink.to][this.location.currentLink.from];
@@ -171,8 +176,12 @@ export class Train extends GameObject implements ITrain {
             let newStationId = line.stationIds[this.location.stationIndex];
 
             // Get the next link
-            this.location.currentLink = renderer.links[currentStationId].find(l => l.to === newStationId);
+            this.location.currentLink = renderer.links[currentStationId]?.find(l => l.to === newStationId);
             track = undefined;
+
+            if (!this.location.currentLink) {
+                return 0;
+            }
 
             // Pause the this for its stopping time
             this.location.stopped = true;
