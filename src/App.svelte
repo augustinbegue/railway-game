@@ -175,7 +175,7 @@
 </script>
 
 {#if renderer}
-    <div class="absolute right-0 z-20">
+    <div class="absolute right-0 z-20 flex flex-col justify-start items-end">
         <TimeDisplayComponent />
         <StatsDisplayComponent />
     </div>

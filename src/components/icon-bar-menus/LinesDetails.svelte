@@ -63,7 +63,10 @@
     // TRAINS
     let AddTrainDropdown: HTMLElement;
     function addTrain(trainId: number) {
-        Train.addToLine(trainId, $lines[currentLine.id]);
+        gameData.update((data) => {
+            Train.addToLine(data, trainId, $lines[currentLine.id]);
+            return data;
+        });
         toggleAddTrainDropdown();
     }
 

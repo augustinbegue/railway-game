@@ -1,10 +1,10 @@
 import type { Path } from "two.js/src/path";
-import type { ILink, IPassenger, ITrain, ITrainSchedule, Position } from "../types";
+import type { GameData, ILink, IPassenger, ITrain, ITrainSchedule, Position } from "../types";
 import type { GameRenderer } from "./GameRenderer";
 import { GameStorage } from "./GameStorage";
 import trainsJSON from "../data/trains/rer.json";
 import type { Line } from "./Line";
-import { trains } from "../stores";
+import { gameData, trains } from "../stores";
 import { GameObject } from "./GameObject";
 
 export class Train extends GameObject implements ITrain {
@@ -295,7 +295,14 @@ export class Train extends GameObject implements ITrain {
      * @param typeId id of the train type to add
      * @param lineId id of the line to add the train to
      */
-    static addToLine(typeId: number, line: Line) {
+    static addToLine(_gameData: GameData, typeId: number, line: Line) {
+        // Check if there is enough money
+        if (_gameData.economy.money < _gameData.prices.train.buy) {
+            return false;
+        } else {
+            _gameData.economy.money -= _gameData.prices.train.buy;
+        }
+
         trains.update(trainByLines => {
             const train = new Train(trainByLines[line.id].length, Train.types[typeId]);
             trainByLines[line.id].push(train);
@@ -303,5 +310,9 @@ export class Train extends GameObject implements ITrain {
             return trainByLines;
         });
         GameStorage.saveDynamic();
+
+        gameData.set(_gameData);
+
+        return true;
     }
 }

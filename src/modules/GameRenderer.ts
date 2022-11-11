@@ -109,7 +109,15 @@ export class GameRenderer {
      * @param station1 
      * @param station2 
      */
-    createLink(station1: Station, station2: Station) {
+    createLink(station1: Station, station2: Station): boolean {
+        // Check if the player can afford the link
+        if (this.gameData.economy.money < this.gameData.prices.link.buy) {
+            return false;
+        } else {
+            this.gameData.economy.money -= this.gameData.prices.link.buy;
+            gameData.set(this.gameData);
+        }
+
         // Create the links between the station and the line if it doesn't already exist
         let link1: ILink = {
             from: station2.id,
@@ -136,6 +144,8 @@ export class GameRenderer {
         // Save modified data
         GameStorage.save(GameStorage.keys.LINKS, this.links);
         GameStorage.save(GameStorage.keys.STATIONS, this.stations);
+
+        return true;
     }
 
     /**

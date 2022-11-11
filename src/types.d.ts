@@ -3,6 +3,11 @@ import type { Circle } from "two.js/src/shapes/circle";
 import type { Text } from "two.js/src/text";
 import type { Train } from "./modules/Train";
 
+export interface Cost {
+    buy: number;
+    maintain: number;
+}
+
 export interface GameData {
     time: {
         multiplicator: number,
@@ -19,6 +24,13 @@ export interface GameData {
         stationSpawnTimeVariation: number,
         passengerArrivalInterval: number,
         passengerArrivalIntervalVariation: number,
+    },
+    economy: {
+        money: number,
+    },
+    prices: {
+        link: Cost,
+        train: Cost,
     }
 }
 

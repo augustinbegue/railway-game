@@ -1,4 +1,4 @@
-import { lines, trains, trainSchedules } from "../stores";
+import { gameData, lines, trains, trainSchedules } from "../stores";
 import type { ILine, ITrainSchedule } from "../types";
 import { GameObject } from "./GameObject";
 import type { GameRenderer } from "./GameRenderer";
@@ -32,7 +32,12 @@ export class Line extends GameObject implements ILine {
         let lastStation = renderer.stations.find(station => station.id === lastStationId);
 
         if (lastStation && !renderer.links[station.id].find(l => l.to === lastStation.id)) {
-            renderer.createLink(lastStation, station);
+            let success = renderer.createLink(lastStation, station);
+
+            if (!success) {
+                // TODO: Message: not enough money
+                return;
+            }
         }
 
         // Add the station to the line

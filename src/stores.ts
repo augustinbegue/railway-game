@@ -26,4 +26,17 @@ export const gameData: Writable<GameData> = writable({
         passengerArrivalInterval: 60,
         passengerArrivalIntervalVariation: 30,
     },
+    economy: {
+        money: 2000,
+    },
+    prices: {
+        link: {
+            buy: 100,
+            maintain: 10,
+        },
+        train: {
+            buy: 1000,
+            maintain: 100,
+        },
+    },
 });
