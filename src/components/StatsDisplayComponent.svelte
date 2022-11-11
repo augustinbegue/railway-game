@@ -4,7 +4,7 @@
 
 <div class="mx-6 my-2 text-dark-500 pr-4 bg-dark-200 rounded-full w-fit">
     <span class="font-mono text-xl p-2 rounded-full bg-dark-100 grow">
-        {$gameData.economy.money}
+        {Math.round($gameData.economy.money)}
     </span>
     <div class="inline-flex ml-2">
         <span class="font-semibold"> € </span>

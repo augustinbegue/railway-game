@@ -215,9 +215,20 @@ export class GameRenderer {
     }
 
     update(frameCount: number, timeDelta: number) {
+        let startMoney = this.gameData.economy.money;
+
         // Updating GameTime
-        let elapsedTime = (timeDelta / 1000) * this.gameData.time.multiplicator;
-        this.gameData.time.seconds += (timeDelta / 1000) * this.gameData.time.multiplicator;
+        let elapsedSeconds = (timeDelta / 1000) * this.gameData.time.multiplicator;
+        this.gameData.time.seconds += elapsedSeconds;
+
+        // Substract maintenance costs
+        let linksNumber = 0;
+        this.links.forEach(l => linksNumber += l.length);
+        this.gameData.economy.money -= linksNumber * (this.gameData.prices.link.maintain / (60 * 60)) * elapsedSeconds;
+        let trainsNumber = 0;
+        this.trains.forEach(t => trainsNumber += t.length);
+        this.gameData.economy.money -= trainsNumber * (this.gameData.prices.train.maintain / (60 * 60)) * elapsedSeconds;
+
 
         // Update stations spawn time
         if (this.gameData.time.nextStationSpawn <= 0) {
@@ -239,7 +250,7 @@ export class GameRenderer {
                 this.draw();
             }
         } else {
-            this.gameData.time.nextStationSpawn -= elapsedTime;
+            this.gameData.time.nextStationSpawn -= elapsedSeconds;
         }
         let spawnedStations = this.stations.filter(s => s.spawned);
 
@@ -274,7 +285,7 @@ export class GameRenderer {
                         this.checkStationForRedraw(prevStationCount, station);
                     }
                 } else {
-                    station.nextPassengerArrival -= elapsedTime;
+                    station.nextPassengerArrival -= elapsedSeconds;
                 }
             }
         }
@@ -293,6 +304,9 @@ export class GameRenderer {
 
         gameData.set(this.gameData);
         trains.set(this.trains);
+
+        let endMoney = this.gameData.economy.money;
+        let moneyDelta = endMoney - startMoney;
     }
 
     checkStationForRedraw(prevStationCount: number, station: Station) {

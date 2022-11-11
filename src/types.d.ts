@@ -27,6 +27,7 @@ export interface GameData {
     },
     economy: {
         money: number,
+        ticketPrice: number,
     },
     prices: {
         link: Cost,

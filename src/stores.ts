@@ -28,6 +28,7 @@ export const gameData: Writable<GameData> = writable({
     },
     economy: {
         money: 2000,
+        ticketPrice: 2,
     },
     prices: {
         link: {

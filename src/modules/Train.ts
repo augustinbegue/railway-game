@@ -70,6 +70,7 @@ export class Train extends GameObject implements ITrain {
         const currentStation = renderer.stations[currentStationId];
         const newStation = renderer.stations[line.stationIds[this.location.stationIndex]];
 
+        let boardedPassengers = 0;
         for (let i = 0; i < currentStation.waitingPassengers.length; i++) {
             if (this.passengers.length > this.info.capacity)
                 break;
@@ -83,8 +84,11 @@ export class Train extends GameObject implements ITrain {
                 this.passengers.push(p);
                 currentStation.waitingPassengers.splice(i, 1);
                 i--;
+                boardedPassengers++;
             }
         }
+
+        return boardedPassengers;
     }
 
     update(renderer: GameRenderer, line: Line, schedule: ITrainSchedule, timeDelta: number) {
@@ -109,7 +113,12 @@ export class Train extends GameObject implements ITrain {
                 this.location.currentLink = renderer.links[line.stationIds[0]].find(l => l.to === line.stationIds[1]);
 
                 // Check if passengers need to board
-                this.boardPassengers(renderer, line, line.stationIds[0]);
+                let boardedPassengers = this.boardPassengers(renderer, line, line.stationIds[0]);
+                gameData.update(d => {
+                    d.economy.money += boardedPassengers * d.economy.ticketPrice;
+                    return d;
+                });
+
             } else {
                 return 0;
             }
@@ -192,7 +201,12 @@ export class Train extends GameObject implements ITrain {
             passengersServed = this.disembarkPassengers(renderer, line, currentStationId);
 
             // Check if passengers need to board
-            this.boardPassengers(renderer, line, currentStationId);
+            let boardedPassengers = this.boardPassengers(renderer, line, currentStationId);
+            gameData.update(d => {
+                d.economy.money += boardedPassengers * d.economy.ticketPrice;
+                return d;
+            });
+
 
             // Check if the station needs to be redrawn
             renderer.checkStationForRedraw(prevPassengerCount, currentStation);
